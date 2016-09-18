@@ -1,0 +1,298 @@
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    <title>Six Months of Akka.NET - Stephen Kennedy</title>
+
+    <meta name="HandheldFriendly" content="True">
+    <meta name="MobileOptimized" content="320">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+    <meta name="description" content="">
+
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Six Months of Akka.NET">
+    <meta name="twitter:description" content="">
+
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Six Months of Akka.NET">
+    <meta property="og:description" content="">
+
+    <link href="../favicon.ico" rel="shortcut icon" type="image/x-icon">
+    <link href="http://localhost:2368/apple-touch-icon-precomposed.png" rel="apple-touch-icon">
+
+    <link rel="stylesheet" type="text/css" href="../assets/css/uno.css?v=86ac6b006d">
+
+    <link rel="canonical" href="http://www.devenable.com/six-months-of-akka-net/">
+    <meta name="referrer" content="no-referrer-when-downgrade">
+    <link rel="amphtml" href="http://www.devenable.com/six-months-of-akka-net/amp/">
+    
+    <meta property="og:site_name" content="Stephen Kennedy">
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Six Months of Akka.NET">
+    <meta property="og:description" content="I've been using Akka.NET in a real-world commercial project for a large organisation that operates in the finance industry.  This project has been in development for 6 months now.  I've wrapped up some of my thoughts on the technology / actor model in this post. Conclusion As Akka.NET is">
+    <meta property="og:url" content="http://www.devenable.com/six-months-of-akka-net/">
+    <meta property="article:published_time" content="2016-02-16T21:34:48.000Z">
+    <meta property="article:modified_time" content="2016-02-16T21:34:48.000Z">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Six Months of Akka.NET">
+    <meta name="twitter:description" content="I've been using Akka.NET in a real-world commercial project for a large organisation that operates in the finance industry.  This project has been in development for 6 months now.  I've wrapped up some of my thoughts on the technology / actor model in this post. Conclusion As Akka.NET is">
+    <meta name="twitter:url" content="http://www.devenable.com/six-months-of-akka-net/">
+    <meta name="twitter:label1" content="Written by">
+    <meta name="twitter:data1" content="Stephen Kennedy">
+    
+    <script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "publisher": {
+        "@type": "Organization",
+        "name": "Stephen Kennedy",
+        "logo": "http://www.devenable.com/ghost/img/ghosticon.jpg"
+    },
+    "author": {
+        "@type": "Person",
+        "name": "Stephen Kennedy",
+        "url": "http://www.devenable.com/author/stephen-kennedy/",
+        "sameAs": []
+    },
+    "headline": "Six Months of Akka.NET",
+    "url": "http://www.devenable.com/six-months-of-akka-net/",
+    "datePublished": "2016-02-16T21:34:48.000Z",
+    "dateModified": "2016-02-16T21:34:48.000Z",
+    "description": "I&#x27;ve been using Akka.NET in a real-world commercial project for a large organisation that operates in the finance industry.  This project has been in development for 6 months now.  I&#x27;ve wrapped up some of my thoughts on the technology / actor model in this post. Conclusion As Akka.NET is",
+    "mainEntityOfPage": {
+        "@type": "WebPage",
+        "@id": "http://www.devenable.com"
+    }
+}
+    </script>
+
+    <meta name="generator" content="Ghost 0.11">
+    <link rel="alternate" type="application/rss+xml" title="Stephen Kennedy" href="http://www.devenable.com/rss/">
+
+</head>
+<body class="post-template no-js">
+
+    <span class="mobile btn-mobile-menu">
+        <i class="icon icon-list btn-mobile-menu__icon"></i>
+        <i class="icon icon-x-circle btn-mobile-close__icon hidden"></i>
+    </span>
+
+    <header class="panel-cover panel-cover--collapsed ">
+  <div class="panel-main">
+
+    <div class="panel-main__inner panel-inverted">
+    <div class="panel-main__content">
+
+        <h1 class="panel-cover__title panel-title"><a href="http://www.devenable.com" title="link to homepage for Stephen Kennedy">Stephen Kennedy</a></h1>
+        <hr class="panel-cover__divider">
+        <p class="panel-cover__description">Software engineer in the Microsoft technology stack, focusing on native and high-scale systems development.  Works for Readify.</p>
+        <hr class="panel-cover__divider panel-cover__divider--secondary">
+
+        <div class="navigation-wrapper">
+
+          <nav class="cover-navigation cover-navigation--primary">
+            <ul class="navigation">
+              <li class="navigation__item"><a href="../index.html#blog" title="link to Stephen Kennedy blog" class="blog-button">Blog</a></li>
+            </ul>
+          </nav>
+
+          
+<nav class="cover-navigation navigation--social">
+  <ul class="navigation">
+
+
+  <!-- Twitter -->
+  <li class="navigation__item">
+    <a href="http://twitter.com/daleanthony" title="@DaleAnthony on Twitter">
+      <i class="icon icon-social-twitter"></i>
+      <span class="label">Twitter</span>
+    </a>
+  </li>
+
+    <!-- Dribbble -->
+    <li class="navigation__item">
+      <a href="http://dribbble.com/daleanthony" title="Dale-Anthony on Dribbble">
+        <i class="icon icon-social-dribbble"></i>
+        <span class="label">Dribbble</span>
+      </a>
+    </li>
+
+    <!-- Email -->
+    <li class="navigation__item">
+      <a href="mailto:hello@daleanthony.com" title="Email hello@daleanthony.com">
+        <i class="icon icon-mail"></i>
+        <span class="label">Email</span>
+      </a>
+    </li>
+
+    <!-- RSS -->
+    <li class="navigation__item">
+      <a href="../rss/index.rss" title="Subscribe">
+        <i class="icon icon-rss"></i>
+        <span class="label">RSS</span>
+      </a>
+    </li>
+
+  </ul>
+</nav>
+
+        </div>
+
+      </div>
+
+    </div>
+
+    <div class="panel-cover--overlay"></div>
+  </div>
+</header>
+    <div class="content-wrapper">
+        <div class="content-wrapper__inner">
+            
+
+  <article class="post-container post-container--single">
+
+    <header class="post-header">
+      <div class="post-meta">
+        <time datetime="17 Feb 2016" class="post-meta__date date">17 Feb 2016</time> • <span class="post-meta__tags tags"></span>
+        <!--<span class="post-meta__author author"><img src="" alt="profile image for Stephen Kennedy" class="avatar post-meta__avatar" /> by Stephen Kennedy</span>-->
+      </div>
+      <h1 class="post-title">Six Months of Akka.NET</h1>
+    </header>
+
+    <section class="post">
+      <p class="intro">I've been using Akka.NET in a real-world commercial project for a large organisation that operates in the finance industry.  This project has been in development for 6 months now.  I've wrapped up some of my thoughts on the technology / actor model in this post.</p>
+
+<h1 id="conclusion">Conclusion</h1>
+
+<p><em>As Akka.NET is a framework, most people are interested in how it sits as a whole, before drilling into specifics.  Much of what I've found can probably be applied to other actor model implementations such as Orleans.</em></p>
+
+<p>I really liked the framework.  </p>
+
+<p>Much like my first foray's into F#, Akka.NET allows you to solve problems in a different way.  Much of Akka.NET's benefits are 'publicised' arounds it clustering capabilities.  And while these are certainly apparent and useful, it is the design patterns that you can create and use that is really what makes me excited about the actor model and this technology.</p>
+
+<p>I did find it made automated unit testing harder, and its highly decoupled approach did have an impact on cohesiveness.  It also comes with a large learning curve, particularly those new to actor model and unfamiliar with message-based or event-driven design patterns.  </p>
+
+<p>There is also some level of architectural / design investment in using the framework properly, so like any tool, you are going to want to use it wisely.</p>
+
+<p>I wouldn't use Akka.NET on every project.  And I'd certainly consider alternate actor model implementations based on the project.  However, I definitely will continue to invest my time in the technology based on my experiences with it to date.</p>
+
+<p>If you want to learn more about Akka.NET, I highly, highly, recommend Petabridge's <a href="https://github.com/petabridge/akka-bootcamp">free bootcamp</a>.  </p>
+
+<h1 id="randomthoughts">Random thoughts</h1>
+
+<p>I'm not going to discuss all of the benefits of Akka, Akka.NET, and the actor model.  There is plenty of content that can be found online for this.  What I am going to talk about are some of the less obvious things that I discovered.</p>
+
+<h3 id="decoupleme">Decouple me</h3>
+
+<p>Akka.NET is highly decoupled.  </p>
+
+<p>Actors generally communicate or associate through an IActorRef (or equivilent).  Which means you can only tell (fire and forget) or ask (request and response) them something.  This IActorRef is a proxy, so you can't even directly access or cast to that actor, even if it exists in the same process.</p>
+
+<p>Really great for testing, seperating concerns, and aggregating.  Unfortunately, in larger codebases it can make the code less cohesive, and you often find yourself looking at message types in order to figure out the flow of the system.  Not a deal-breaker with a sensible design though.</p>
+
+<h3 id="thedoubleedgedconcurrencymodel">The double-edged concurrency model</h3>
+
+<p>One of the salient points of Akka.NET is its concurrency model.</p>
+
+<p>Each Akka.NET actor has two messages queues in front of it (one for user messages, one for system messages).  Akka.NET guarantees that an actor can only process one message at a time.</p>
+
+<p>This simplifies application logic, because you no longer need to concern yourself with concurrency protection when executing code inside an actor.  You can concentrate on the domain, and the business logic.</p>
+
+<p>However, given that in Akka.NET everything is concurrent by default it does make automated testing more difficult.  Thankfully Akka.NET comes with a <a href="http://codingjourneyman.com/2015/07/08/testing-akkanet-actors-with-akka-testkit/">TestKit</a>, which makes unit tests much simpler to write, and more reliable.  Unfortunately, in my experience, once you have a large suite of automated  tests, you can sometimes get random test failures.  This is more likely to occur in tests involving a scheduler (or TestScheduler) and in tests that are closer to integration tests, rather than unit tests.  </p>
+
+<p>Kids, this is why you should avoid writing code that that potentially spawns a background thread, assuming you want to test it of course.</p>
+
+<p><em>Note:</em> I've not yet invested enough time in trying to track down why we get these random failures, it might be that we need to change the dispatcher.  But, in our experience, the problems with testing are not easy and apparent to fix.</p>
+
+<h3 id="finitestatemachineallthethings">Finite state machine all the things</h3>
+
+<p>I love Akka.NET's <a href="http://getakka.net/docs/working-with-actors/Switchable%20Behaviors">Become</a> method.  </p>
+
+<p>It simplifies what would ordinarily be complicated actors, and makes it much easier to reason about their purpose and functionality.</p>
+
+<p>One of the main ways we used this method is to make an actor available to receive messages, while it isn't ready to process them.  We make a request to another actor to get the data that this actor needs in order to process messages.  Any messages that aren't related to the loading of the actor are stashed, until the actor is ready to process messages.  (Which is another call to Become, in order to switch the actors state)</p>
+
+<p>One of my favourite features of Akka.NET.</p>
+
+<h3 id="distributedcomputingisstillhard">Distributed computing is still hard</h3>
+
+<p>Okay, this one wasn't really a surprise.  </p>
+
+<p>I just wanted to point out than even though the tooling gives you a great framework to operate from, you are still going to have to be aware of, and consider the usual suspects, such as consensus, message delivery guarantees, network partitions, and any other sorts of failures.</p>
+
+<p>You're also going to have to consider performance, particularly in regards to network IO.  The Akka.NET team could write the best networking code in the world, but if your communication is very chatty or contains large message payloads, it ain't going to matter.</p>
+
+<h3 id="locationtransparencyisalie">Location transparency is a lie</h3>
+
+<p>Okay, not entirely.  </p>
+
+<p>It is true that when all you have is an IActorRef to another actor you have no idea (nor should you care) if that actor exists in the same process, or on a different process.  It still gives the same powerful scalability benefits, but there are a few less obvious gotcha's.</p>
+
+<ul>
+<li>Actor selection only by default only works within the local actor system (i.e. same process).  You can still do selection across a cluster with a grouped router, but it isn't as idiomatic.
+<ul><li>You can use actor selection remotely, however, you need to know the remote host endpoint.</li></ul></li>
+<li>When creating actors through props, those props need to be serialisable.</li>
+<li>You often consider the messaging and interaction between actors for performance reasons before potentially remotely deploying or communicating over the cluster.</li>
+</ul>
+
+<h3 id="stateisnolongerevil">State is no longer evil</h3>
+
+<p>Web applications are a staple of software development.  HTTP is inherently stateless, however, applications are inherently stateful.  </p>
+
+<p>As developers we try to bridge this gap using constructs such as session state and cookies.  In my view, these are hacks.  They cause all sorts of problems, in terms of performance and scale.  </p>
+
+<p>Typical n-tier architecture and design revolves around using a database as a backing store to persist state.  These constraints limit solution design, and introduce bottlenecks in the system.  </p>
+
+<p><a href="https://petabridge.com/blog/stateful-web-applications/">This blog post</a> talks about how one might implement stateful web applications with the actor model. </p>
+
+<h3 id="designpatternareus">Design pattern are us</h3>
+
+<p>The actor model opens up some really cool design patterns, opening up many of the message-based patterns you can read about.  </p>
+
+<p>The ease at which you can implement patterns such as pub / sub and message aggregation patterns lets you solve problems in a different manner to how you probably typically would.</p>
+
+<p>For example, in a typical application independent isolated HTTP requests might load a product with a particular identity.  One of the patterns we came up was to aggregate these individual requests for data into one, to send to SQL.  This limits the overhead on the database as one larger call is generally better performance than lots of small calls.</p>
+
+<h3 id="actorshaveidentity">Actors have identity</h3>
+
+<p>Akka.NET has its own protocol, akka.tcp.  Like the HTTP protocol that your browser knows how to interact with, the Akka.NET framework also knows how to interact with this protocol.  You can communicate with actors across the cluster that you have not established any prior direct communication with. </p>
+
+<p>It also means that you can host your entities on the actor system.  Entities that store and track state, such as inventory, can be accessed with concurrency protection across the cluster.  Fast in-memory access can modify that state, while writes to persistant storage can happen asynchronously as the response is sent back to the requestor.</p>
+
+<h3 id="clusterit">Cluster it</h3>
+
+<p>Akka.NET's clustering is great.  It works as advertised, and you have a lot of power and flexibility in how you deal with the cluster.</p>
+
+<p>Unlike Orleans you do need to think a lot more about how you are going to distribute work and the messaging interaction as it involves less magic.  Depending on the solution you are developing, this may, or may not, be a good thing.</p>
+
+<p>There are a couple of tricky spots when you deal with clustering. </p>
+
+<ul>
+<li>Sometimes the actor may not be ready to receive messages immediately after remotely deployment of an actor, so you may want to introduce some sort of acknowledgement message for when the actor is up and ready to accept messages.</li>
+<li>Akka.NET's default serialisation is Protobuf for Akka.NET's well known message types, and JSON for your own application messages.  Sometimes when there is a serialisation exception it is difficult to figure out which message type is causing the serialisation problem as you get a fairly vanilla stack trace from JSON.Net.</li>
+</ul>
+    </section>
+
+  </article>
+
+
+
+
+            <footer class="footer">
+    <span class="footer__copyright">© 2016. All rights reserved.</span>
+    <span class="footer__copyright"><a href="http://uno.daleanthony.com" title="link to page for Uno Ghost theme">Uno theme</a> by <a href="http://daleanthony.com" title="link to website for Dale-Anthony">Dale-Anthony</a></span>
+    <span class="footer__copyright">Proudly published with <a href="http://ghost.org" title="link to Ghost website">Ghost</a></span>
+</footer>        </div>
+    </div>
+
+    <!-- You can safely delete this line if your theme does not require jQuery -->
+<script type="text/javascript" src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
+
+    <script type="text/javascript" src="../assets/js/main.js?v=86ac6b006d"></script>
+	<script type="text/javascript" src="http://google-code-prettify.googlecode.com/svn/loader/run_prettify.js"></script>
+</body>

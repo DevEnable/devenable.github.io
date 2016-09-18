@@ -1,0 +1,342 @@
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    <title>Azure Mobile Services Mapped TableController - Stephen Kennedy</title>
+
+    <meta name="HandheldFriendly" content="True">
+    <meta name="MobileOptimized" content="320">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+    <meta name="description" content="">
+
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Azure Mobile Services Mapped TableController">
+    <meta name="twitter:description" content="">
+
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Azure Mobile Services Mapped TableController">
+    <meta property="og:description" content="">
+
+    <link href="../favicon.ico" rel="shortcut icon" type="image/x-icon">
+    <link href="http://localhost:2368/apple-touch-icon-precomposed.png" rel="apple-touch-icon">
+
+    <link rel="stylesheet" type="text/css" href="../assets/css/uno.css?v=86ac6b006d">
+
+    <link rel="canonical" href="http://www.devenable.com/azure-mobile-services-mapped-tablecontroller/">
+    <meta name="referrer" content="no-referrer-when-downgrade">
+    <link rel="amphtml" href="http://www.devenable.com/azure-mobile-services-mapped-tablecontroller/amp/">
+    
+    <meta property="og:site_name" content="Stephen Kennedy">
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Azure Mobile Services Mapped TableController">
+    <meta property="og:description" content="This blog post details how the Mobile Services ApiController serves up data to the mobile clients in my proof of concept.   By default Azure Mobile Services provides a DomainManager which directly exposes the entity over the wire.  Often, particularly for more complex systems you do not want to directly expose">
+    <meta property="og:url" content="http://www.devenable.com/azure-mobile-services-mapped-tablecontroller/">
+    <meta property="article:published_time" content="2014-05-14T10:36:48.000Z">
+    <meta property="article:modified_time" content="2014-10-07T07:52:56.000Z">
+    <meta property="article:tag" content="Mobile Services">
+    
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Azure Mobile Services Mapped TableController">
+    <meta name="twitter:description" content="This blog post details how the Mobile Services ApiController serves up data to the mobile clients in my proof of concept.   By default Azure Mobile Services provides a DomainManager which directly exposes the entity over the wire.  Often, particularly for more complex systems you do not want to directly expose">
+    <meta name="twitter:url" content="http://www.devenable.com/azure-mobile-services-mapped-tablecontroller/">
+    <meta name="twitter:label1" content="Written by">
+    <meta name="twitter:data1" content="Stephen Kennedy">
+    <meta name="twitter:label2" content="Filed under">
+    <meta name="twitter:data2" content="Mobile Services">
+    
+    <script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "publisher": {
+        "@type": "Organization",
+        "name": "Stephen Kennedy",
+        "logo": "http://www.devenable.com/ghost/img/ghosticon.jpg"
+    },
+    "author": {
+        "@type": "Person",
+        "name": "Stephen Kennedy",
+        "url": "http://www.devenable.com/author/stephen-kennedy/",
+        "sameAs": []
+    },
+    "headline": "Azure Mobile Services Mapped TableController",
+    "url": "http://www.devenable.com/azure-mobile-services-mapped-tablecontroller/",
+    "datePublished": "2014-05-14T10:36:48.000Z",
+    "dateModified": "2014-10-07T07:52:56.000Z",
+    "keywords": "Mobile Services",
+    "description": "This blog post details how the Mobile Services ApiController serves up data to the mobile clients in my proof of concept.   By default Azure Mobile Services provides a DomainManager which directly exposes the entity over the wire.  Often, particularly for more complex systems you do not want to directly expose",
+    "mainEntityOfPage": {
+        "@type": "WebPage",
+        "@id": "http://www.devenable.com"
+    }
+}
+    </script>
+
+    <meta name="generator" content="Ghost 0.11">
+    <link rel="alternate" type="application/rss+xml" title="Stephen Kennedy" href="http://www.devenable.com/rss/">
+
+</head>
+<body class="post-template tag-mobile-services no-js">
+
+    <span class="mobile btn-mobile-menu">
+        <i class="icon icon-list btn-mobile-menu__icon"></i>
+        <i class="icon icon-x-circle btn-mobile-close__icon hidden"></i>
+    </span>
+
+    <header class="panel-cover panel-cover--collapsed ">
+  <div class="panel-main">
+
+    <div class="panel-main__inner panel-inverted">
+    <div class="panel-main__content">
+
+        <h1 class="panel-cover__title panel-title"><a href="http://www.devenable.com" title="link to homepage for Stephen Kennedy">Stephen Kennedy</a></h1>
+        <hr class="panel-cover__divider">
+        <p class="panel-cover__description">Software engineer in the Microsoft technology stack, focusing on native and high-scale systems development.  Works for Readify.</p>
+        <hr class="panel-cover__divider panel-cover__divider--secondary">
+
+        <div class="navigation-wrapper">
+
+          <nav class="cover-navigation cover-navigation--primary">
+            <ul class="navigation">
+              <li class="navigation__item"><a href="../index.html#blog" title="link to Stephen Kennedy blog" class="blog-button">Blog</a></li>
+            </ul>
+          </nav>
+
+          
+<nav class="cover-navigation navigation--social">
+  <ul class="navigation">
+
+
+  <!-- Twitter -->
+  <li class="navigation__item">
+    <a href="http://twitter.com/daleanthony" title="@DaleAnthony on Twitter">
+      <i class="icon icon-social-twitter"></i>
+      <span class="label">Twitter</span>
+    </a>
+  </li>
+
+    <!-- Dribbble -->
+    <li class="navigation__item">
+      <a href="http://dribbble.com/daleanthony" title="Dale-Anthony on Dribbble">
+        <i class="icon icon-social-dribbble"></i>
+        <span class="label">Dribbble</span>
+      </a>
+    </li>
+
+    <!-- Email -->
+    <li class="navigation__item">
+      <a href="mailto:hello@daleanthony.com" title="Email hello@daleanthony.com">
+        <i class="icon icon-mail"></i>
+        <span class="label">Email</span>
+      </a>
+    </li>
+
+    <!-- RSS -->
+    <li class="navigation__item">
+      <a href="../rss/index.rss" title="Subscribe">
+        <i class="icon icon-rss"></i>
+        <span class="label">RSS</span>
+      </a>
+    </li>
+
+  </ul>
+</nav>
+
+        </div>
+
+      </div>
+
+    </div>
+
+    <div class="panel-cover--overlay"></div>
+  </div>
+</header>
+    <div class="content-wrapper">
+        <div class="content-wrapper__inner">
+            
+
+  <article class="post-container post-container--single">
+
+    <header class="post-header">
+      <div class="post-meta">
+        <time datetime="14 May 2014" class="post-meta__date date">14 May 2014</time> • <span class="post-meta__tags tags">on <a href="../tag/mobile-services/">Mobile Services</a></span>
+        <!--<span class="post-meta__author author"><img src="" alt="profile image for Stephen Kennedy" class="avatar post-meta__avatar" /> by Stephen Kennedy</span>-->
+      </div>
+      <h1 class="post-title">Azure Mobile Services Mapped TableController</h1>
+    </header>
+
+    <section class="post tag-mobile-services">
+      <p class="intro">This blog post details how the Mobile Services ApiController serves up data to the mobile clients in my <a href="../xamarin-android-with-azure-mobile-services-net-blog-series/">proof of concept</a>.</p>  
+
+<hr>
+
+<p>By default Azure Mobile Services provides a DomainManager which directly exposes the entity over the wire.  Often, particularly for more complex systems you do not want to directly expose your underlying entities, but expose contracts crafted specifically for the service.  And, in the case of the proof of concept we cannot directly expose all of the entity data as the InternetLocation class contains a DbGeography property that cannot be serialized.</p>
+
+<p>There are two reasons why we want to expose a separate service contract.  Firstly, our entity has a member of type DbGeography.  This type cannot be serialized in its current format.  We expose a contract of type MapLocation in its place which contains the longitude and latitude of the location.  Secondly, in many cases you do not want to expose your internal entities directly over the wire.  There are many blog posts on the Internet regarding this, but the simple nutshell is that by exposing your internal entities over the wire you are leaking your internal implementation, and you are unable to create contracts specifically to meet your clients needs.  </p>
+
+<blockquote>
+  <p>For a refresher on the data contracts we are using see <a href="http://www.devenable.com/proof-of-concept-data/">here</a>.</p>
+</blockquote>
+
+<hr>
+
+<h2 id="mappedentitydomainmanager">MappedEntityDomainManager</h2>
+
+<p>As I stated above, the default template for an Azure Mobile Services TableController exposes entities, however, we want to expose a different service contract.  By inheriting from the MappedEntityDomainManager which is briefly described <a href="http://blogs.msdn.com/b/mim/archive/2014/02/28/windows-azure-mobiles-services-c-backend-en-version.aspx">here</a> we are able to internally utilize our persisted entities while exposing service contracts.</p>
+
+<blockquote>
+  <p><em>Note:</em> As engineers we tend to scour the Internet quite often looking for answers to problems, and as such, blog posts, tend to contain, answers instead of questions.  Unfortunately, this is not such a blog post.  I've been looking at the recently released Azure Mobile Services (.Net) backend libraries and while I have a working solution, at present this is probably not what the Azure team was after in terms of best practice.  Hopefully, if the Azure team can update their documentation / guidance I will come back and update this blog post.</p>
+</blockquote>
+
+<p>MappedEntityDomainManager uses <a href="http://automapper.org/">AutoMapper</a> to map between the domain entities and service contracts.</p>
+
+<hr>
+
+<h3 id="internetlocationdomainmanager">InternetLocationDomainManager</h3>
+
+<p>Arguably, I should have explained this class in the data blog post.  However, I decided that it would be clearer what was going on if explained in conjunction with the TableController.</p>
+
+<p>For my implementation I used the <a href="https://github.com/WindowsAzure/azure-mobile-services/blob/master/test/ZumoE2EServerApp/Utils/ComplexTypeDomainManager.cs">sample class</a> as a baseline.  While I have implemented the abstract members as per the sample, unfortunately I could not verify that they are actually being called(see testing the mapping).</p>
+
+<h3 id="entitymappings">Entity mappings</h3>
+
+<p>I made my AutoMapper mappings part of the WebApiConfig.Register method call.  The mappings are as such:</p>
+
+<pre><code class="language-prettyprint lang-cs"> Mapper.Initialize(cfg =&gt;
+            {
+                cfg.CreateMap&lt; DbGeography, MapLocation &gt;()
+                    .ForMember(dst =&gt; dst.Latitude, map =&gt; map.MapFrom(s =&gt; s.Latitude.Value))
+                    .ForMember(dst =&gt; dst.Longitude, map =&gt; map.MapFrom(s =&gt; s.Longitude.Value));
+
+                cfg.CreateMap&lt; InternetLocation, InternetLocationModel &gt;()
+                    .ForMember(dst =&gt; dst.Location, map =&gt; map.MapFrom(s =&gt; s.Location));
+            });
+</code></pre>
+
+<p>Since I am only doing a one-way mapping from my domain entity to the service contract I only require one way mappings.  One for the InternetLocationModel that I expose, and one for the MapLocation model that is part of the InternetLocationModel contract.</p>
+
+<hr>
+
+<h3 id="testingthatthemappingworks">Testing that the mapping works</h3>
+
+<p>This bit is weird.  It may just have been my development environment (recent rebuild) but I cannot seem to get the debugger to hit a breakpoint on my InternetLocationDomainManager (it will break on my TableController).  Through the responses that come back from the service though I have been able to verify that the mapping is occurring.  This is both through the mobile applications which have their own custom method, as well as through the webpages that Microsoft provide you to test with.  A call to the service with the relative URL of:</p>
+
+<p><em>tables/InternetLocation?$filter=(hasWifi eq true)</em></p>
+
+<p>Will return only the Internet locations that have WiFi in the expected JSON format.</p>
+
+<hr>
+
+<h3 id="thecode">The Code</h3>
+
+<pre><code class="language-prettyprint lang-cs">public class InternetLocationDomainManager : MappedEntityDomainManager &lt;InternetLocationModel , InternetLocation &gt;  
+</code></pre>
+
+<p>You will see in this class declaration that there are two generic arguments.  The first generic argument is the type that will be exposed over the wire, the second is for the persisted entity type.  One thing that I did not mention in my discussion about the <a href="http://www.devenable.com/proof-of-concept-data/">proof of concept data types</a> is that InternetLocationModel inherits from ITableData, this is due to the generic where constraint on the first generic type argument.  I'm not going to go into too much detail on all of the abstract method overloads as the sample class is pretty easy to follow.  But I will showcase two of the methods involved in mapping.</p>
+
+<pre><code class="language-prettyprint lang-cs">protected override SingleResult &lt;InternetLocationModel &gt; LookupEntity(Expression &lt;Func &lt;InternetLocation , bool &gt;&gt; filter)  
+        {
+            DataVicContext context = (DataVicContext ) this .Context;
+
+            return SingleResult .Create(context.InternetLocations.Where(filter)
+                .Select( Mapper.Map&lt; InternetLocationModel &gt;).AsQueryable());
+        }
+public override SingleResult &lt;InternetLocationModel &gt; Lookup( string id)  
+        {
+            var key = GetKey&lt; string&gt;(id);
+            InternetLocation location = this .Context.Set&lt;InternetLocation &gt;().Find(key);
+            List&lt; InternetLocationModel &gt; result = new List &lt;InternetLocationModel &gt;();
+
+            if (location != null)
+            {
+                result.Add( Mapper.Map&lt; InternetLocationModel &gt;(location));
+            }
+
+            return SingleResult .Create(result.AsQueryable());
+        }
+</code></pre>
+
+<p>These methods are what perform the mapping between the internal entity and the exposed service contract.  </p>
+
+<hr>
+
+<h2 id="internetlocationcontroller">InternetLocationController</h2>
+
+<p>As we are using a different DomainManager from the standard template the code here is also a bit different.  This is the entire class in all of its glory:  </p>
+
+<pre><code class="language-prettyprint lang-cs">public class InternetLocationController : TableController &lt;InternetLocationModel &gt;  
+    {
+        private DataVicContext _context;
+
+        protected override void Initialize( HttpControllerContext controllerContext)
+        {
+            base.Initialize(controllerContext);
+            _context = new DataVicContext (Services.Settings.Name);
+            this.DomainManager = new InternetLocationDomainManager (_context, Request, Services);
+        }
+
+        /// &lt;summary&gt;
+        /// Gets all of the locations that have internet available.
+        /// &lt;/summary&gt;
+        /// &lt;returns&gt; Internet locations. &lt;/returns&gt;
+        public IQueryable &lt;InternetLocationModel &gt; GetLocations()
+        {
+            return this.Query();
+        }
+
+        /// &lt;summary&gt;
+        /// Gets all of the internet locations given near a given geography point and within a certain range.
+        /// &lt;/summary&gt;
+        /// &lt;param name="longitude"&gt; Longitude of the location to use as the center of the search.&lt;/param&gt;
+        /// &lt;param name="latitude"&gt; Latitude of the location to use as the center of the search.&lt;/param&gt;
+        /// &lt;param name="distance"&gt; Distance in metres to search out from. &lt;/param&gt;
+        /// &lt;returns&gt; All of the internet locations within the distance from the given point.&lt;/returns&gt;
+        public IEnumerable &lt;InternetLocationModel &gt; GetLocationsNear( double latitude, double longitude, long distance = 2000)
+        {
+            try
+            {
+                 DbGeography geoLocation = GeographyHelper .FromLatitudeLongitude(latitude, longitude);
+                var dbLocations = ( from l in _context.InternetLocations
+                                   where l.Location.Distance(geoLocation) &lt; distance
+                                   select l).ToList();
+
+                return dbLocations.Select( Mapper.Map&lt; InternetLocationModel &gt;);
+            }
+            catch ( Exception ex)
+            {
+                Services.Log.Error(ex);
+                throw;
+            }
+        }
+    }
+</code></pre>
+
+<p>The bulk of the logic that performs the actual query against the database is explained in a <a href="http://rbrundritt.wordpress.com/2012/06/08/entity-framework-5-bing-maps-wpf/">blog post</a> I found during development.  As you can see I have a bit of a hack involved in my custom API method as I am completely bypassing the DomainManager and using the EF context directly.  This is because I could not figure out how to perform a distance calculation using the InternetLocationDomainManager.  The call to this.Query exposes an InternetLocationModel which is what we return via the service, but, I need to be able to query against the underlying DbGeography class so that I can use the inbuilt spatial data types to query distances.</p>
+
+<p>This is the only method that the mobile applications actually call.  They use their inbuilt location services (described in later blog posts) to calculate their location, call the service with their location and then get a set of publicly available Internet locations.</p>
+
+<p>I would <strong><em>gladly</em></strong> accept guidance from the Azure team or community on how to best resolve this.</p>
+    </section>
+
+  </article>
+
+
+
+
+            <footer class="footer">
+    <span class="footer__copyright">© 2016. All rights reserved.</span>
+    <span class="footer__copyright"><a href="http://uno.daleanthony.com" title="link to page for Uno Ghost theme">Uno theme</a> by <a href="http://daleanthony.com" title="link to website for Dale-Anthony">Dale-Anthony</a></span>
+    <span class="footer__copyright">Proudly published with <a href="http://ghost.org" title="link to Ghost website">Ghost</a></span>
+</footer>        </div>
+    </div>
+
+    <!-- You can safely delete this line if your theme does not require jQuery -->
+<script type="text/javascript" src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
+
+    <script type="text/javascript" src="../assets/js/main.js?v=86ac6b006d"></script>
+	<script type="text/javascript" src="http://google-code-prettify.googlecode.com/svn/loader/run_prettify.js"></script>
+</body>

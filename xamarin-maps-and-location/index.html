@@ -1,0 +1,252 @@
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    <title>Xamarin Maps and Location - Stephen Kennedy</title>
+
+    <meta name="HandheldFriendly" content="True">
+    <meta name="MobileOptimized" content="320">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+    <meta name="description" content="">
+
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Xamarin Maps and Location">
+    <meta name="twitter:description" content="">
+
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Xamarin Maps and Location">
+    <meta property="og:description" content="">
+
+    <link href="../favicon.ico" rel="shortcut icon" type="image/x-icon">
+    <link href="http://localhost:2368/apple-touch-icon-precomposed.png" rel="apple-touch-icon">
+
+    <link rel="stylesheet" type="text/css" href="../assets/css/uno.css?v=86ac6b006d">
+
+    <link rel="canonical" href="http://www.devenable.com/xamarin-maps-and-location/">
+    <meta name="referrer" content="no-referrer-when-downgrade">
+    <link rel="amphtml" href="http://www.devenable.com/xamarin-maps-and-location/amp/">
+    
+    <meta property="og:site_name" content="Stephen Kennedy">
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Xamarin Maps and Location">
+    <meta property="og:description" content="The conclusion to my blog series on Xamarin Maps and Location.   This was originally meant to be a longer in more detail blog series.  But time and other priorities have gotten in the way.   ... I do actually have a working solution across the 3 platforms though on GitHub. The solution">
+    <meta property="og:url" content="http://www.devenable.com/xamarin-maps-and-location/">
+    <meta property="article:published_time" content="2014-09-29T22:55:01.000Z">
+    <meta property="article:modified_time" content="2014-10-07T07:49:23.000Z">
+    <meta property="article:tag" content="Xamarin">
+    
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Xamarin Maps and Location">
+    <meta name="twitter:description" content="The conclusion to my blog series on Xamarin Maps and Location.   This was originally meant to be a longer in more detail blog series.  But time and other priorities have gotten in the way.   ... I do actually have a working solution across the 3 platforms though on GitHub. The solution">
+    <meta name="twitter:url" content="http://www.devenable.com/xamarin-maps-and-location/">
+    <meta name="twitter:label1" content="Written by">
+    <meta name="twitter:data1" content="Stephen Kennedy">
+    <meta name="twitter:label2" content="Filed under">
+    <meta name="twitter:data2" content="Xamarin">
+    
+    <script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "publisher": {
+        "@type": "Organization",
+        "name": "Stephen Kennedy",
+        "logo": "http://www.devenable.com/ghost/img/ghosticon.jpg"
+    },
+    "author": {
+        "@type": "Person",
+        "name": "Stephen Kennedy",
+        "url": "http://www.devenable.com/author/stephen-kennedy/",
+        "sameAs": []
+    },
+    "headline": "Xamarin Maps and Location",
+    "url": "http://www.devenable.com/xamarin-maps-and-location/",
+    "datePublished": "2014-09-29T22:55:01.000Z",
+    "dateModified": "2014-10-07T07:49:23.000Z",
+    "keywords": "Xamarin",
+    "description": "The conclusion to my blog series on Xamarin Maps and Location.   This was originally meant to be a longer in more detail blog series.  But time and other priorities have gotten in the way.   ... I do actually have a working solution across the 3 platforms though on GitHub. The solution",
+    "mainEntityOfPage": {
+        "@type": "WebPage",
+        "@id": "http://www.devenable.com"
+    }
+}
+    </script>
+
+    <meta name="generator" content="Ghost 0.11">
+    <link rel="alternate" type="application/rss+xml" title="Stephen Kennedy" href="http://www.devenable.com/rss/">
+
+</head>
+<body class="post-template tag-xamarin no-js">
+
+    <span class="mobile btn-mobile-menu">
+        <i class="icon icon-list btn-mobile-menu__icon"></i>
+        <i class="icon icon-x-circle btn-mobile-close__icon hidden"></i>
+    </span>
+
+    <header class="panel-cover panel-cover--collapsed ">
+  <div class="panel-main">
+
+    <div class="panel-main__inner panel-inverted">
+    <div class="panel-main__content">
+
+        <h1 class="panel-cover__title panel-title"><a href="http://www.devenable.com" title="link to homepage for Stephen Kennedy">Stephen Kennedy</a></h1>
+        <hr class="panel-cover__divider">
+        <p class="panel-cover__description">Software engineer in the Microsoft technology stack, focusing on native and high-scale systems development.  Works for Readify.</p>
+        <hr class="panel-cover__divider panel-cover__divider--secondary">
+
+        <div class="navigation-wrapper">
+
+          <nav class="cover-navigation cover-navigation--primary">
+            <ul class="navigation">
+              <li class="navigation__item"><a href="../index.html#blog" title="link to Stephen Kennedy blog" class="blog-button">Blog</a></li>
+            </ul>
+          </nav>
+
+          
+<nav class="cover-navigation navigation--social">
+  <ul class="navigation">
+
+
+  <!-- Twitter -->
+  <li class="navigation__item">
+    <a href="http://twitter.com/daleanthony" title="@DaleAnthony on Twitter">
+      <i class="icon icon-social-twitter"></i>
+      <span class="label">Twitter</span>
+    </a>
+  </li>
+
+    <!-- Dribbble -->
+    <li class="navigation__item">
+      <a href="http://dribbble.com/daleanthony" title="Dale-Anthony on Dribbble">
+        <i class="icon icon-social-dribbble"></i>
+        <span class="label">Dribbble</span>
+      </a>
+    </li>
+
+    <!-- Email -->
+    <li class="navigation__item">
+      <a href="mailto:hello@daleanthony.com" title="Email hello@daleanthony.com">
+        <i class="icon icon-mail"></i>
+        <span class="label">Email</span>
+      </a>
+    </li>
+
+    <!-- RSS -->
+    <li class="navigation__item">
+      <a href="../rss/index.rss" title="Subscribe">
+        <i class="icon icon-rss"></i>
+        <span class="label">RSS</span>
+      </a>
+    </li>
+
+  </ul>
+</nav>
+
+        </div>
+
+      </div>
+
+    </div>
+
+    <div class="panel-cover--overlay"></div>
+  </div>
+</header>
+    <div class="content-wrapper">
+        <div class="content-wrapper__inner">
+            
+
+  <article class="post-container post-container--single">
+
+    <header class="post-header">
+      <div class="post-meta">
+        <time datetime="30 Sep 2014" class="post-meta__date date">30 Sep 2014</time> • <span class="post-meta__tags tags">on <a href="../tag/xamarin/">Xamarin</a></span>
+        <!--<span class="post-meta__author author"><img src="" alt="profile image for Stephen Kennedy" class="avatar post-meta__avatar" /> by Stephen Kennedy</span>-->
+      </div>
+      <h1 class="post-title">Xamarin Maps and Location</h1>
+    </header>
+
+    <section class="post tag-xamarin">
+      <p class="intro">The conclusion to my blog series on Xamarin Maps and Location.</p>
+
+<blockquote>
+  <p>This was originally meant to be a longer in more detail blog series.  But time and other priorities have gotten in the way.  </p>
+</blockquote>
+
+<p>... I do actually have a working solution across the 3 platforms though on GitHub.</p>
+
+<h2 id="thesolution">The solution</h2>
+
+<p><a href="https://github.com/DevEnable/DataVic">https://github.com/DevEnable/DataVic</a></p>
+
+<hr>
+
+<h2 id="quickstart">Quickstart</h2>
+
+<p>You shouldn't need to do much in order to get the solution working.  There are a few things you will need to do though.</p>
+
+<ul>
+<li>There are a few API keys you will need to supply.
+<ul><li>In the <a href="https://www.devenable.com/proof-of-concept-common-mobile-services-client-pcl/">DataClient</a> - your Azure Mobile Services key once you've hosted it.</li>
+<li>Inside the GeoLocator - a <a href="https://www.devenable.com/finding-locations-with-bing-maps-on-a-server/">Bing maps API key</a></li>
+<li>Inside AndroidManifest.xml - your Google play API key</li></ul></li>
+<li>You will need to host your Azure Mobile Service
+<ul><li>Ensure that you run the <a href="https://www.devenable.com/azure-mobile-services-scheduled-jobs/">scheduled job</a> at least once.</li></ul></li>
+</ul>
+
+<p>From there it should be pretty cut and dry in terms of what you need to do.</p>
+
+<hr>
+
+<h2 id="clientoverviewandfeatures">Client overview and features</h2>
+
+<p>In terms of the functionality the clients will communicate with the Azure Mobile Services for all of their data.  The data is centered around Melbourne, Victoria, Australia and you will need to use each devices relevant location mocking features in order to find internet locations on the client.</p>
+
+<p>The iPhone and Android versions are slightly more fully featured than the Windows Phone version.  (I'd claim keeping with industry standard, but it was more sheer laziness on my part)</p>
+
+<p>In general though when moving through locations the client will search for internet hotspots.  If they have WiFi it will show an estimated radius of signal as an overlay, but if they are wired only then they will appear as a marker (or pushpin, or whatever the device calls it).</p>
+
+<p>Below is an example screenshot taken from the iOS simulator.</p>
+
+<p><img src="../content/images/2014/Sep/iOS_DataVic.png" alt=""></p>
+
+<hr>
+
+<h2 id="mockinglocationemulators">Mocking location &amp; emulators</h2>
+
+<p>I just wanted to make one special mention regarding mocking location.  </p>
+
+<p>Windows Phone has a brilliant emulator that makes doing this sort of stuff so simple.  And the iPhone simulator, while not as good at least lets you do the job as you can just plug in a latitude and longitude.</p>
+
+<p>The Android emulators are rotten.  For a platform that touts extensibility, by far the hardest and most time consuming piece was trying to get these emulators to work, especially a version with Google Play installed.  I probably burnt a good 6 or 7 hours on this infuriating task and still failed.  Do yourself a favour, look at using <a href="http://www.genymotion.com/">Genymotion</a> or something similar.  </p>
+
+<p>Also the Android SDK emulators only give you two options to mock location.  Telnet (seriously?) or by putting code inside the Android client to tell it what locations to mock.  Again, Genymotion offers a better solution as it gives you a UI to mock location with.  </p>
+
+<hr>
+
+<h2 id="lookingformorehelp">Looking for more help</h2>
+
+<p>Everything I did was as a result of looking at blog posts or using the examples Xamarin provide.  Feel free to drop a line if you are having any issues with my sample and I will point you in the right direction.</p>
+    </section>
+
+  </article>
+
+
+
+
+            <footer class="footer">
+    <span class="footer__copyright">© 2016. All rights reserved.</span>
+    <span class="footer__copyright"><a href="http://uno.daleanthony.com" title="link to page for Uno Ghost theme">Uno theme</a> by <a href="http://daleanthony.com" title="link to website for Dale-Anthony">Dale-Anthony</a></span>
+    <span class="footer__copyright">Proudly published with <a href="http://ghost.org" title="link to Ghost website">Ghost</a></span>
+</footer>        </div>
+    </div>
+
+    <!-- You can safely delete this line if your theme does not require jQuery -->
+<script type="text/javascript" src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
+
+    <script type="text/javascript" src="../assets/js/main.js?v=86ac6b006d"></script>
+	<script type="text/javascript" src="http://google-code-prettify.googlecode.com/svn/loader/run_prettify.js"></script>
+</body>

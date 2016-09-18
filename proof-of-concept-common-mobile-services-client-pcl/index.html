@@ -1,0 +1,251 @@
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    <title>Proof of Concept - Common Mobile Services Client (PCL) - Stephen Kennedy</title>
+
+    <meta name="HandheldFriendly" content="True">
+    <meta name="MobileOptimized" content="320">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+    <meta name="description" content="">
+
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Proof of Concept - Common Mobile Services Client (PCL)">
+    <meta name="twitter:description" content="">
+
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Proof of Concept - Common Mobile Services Client (PCL)">
+    <meta property="og:description" content="">
+
+    <link href="../favicon.ico" rel="shortcut icon" type="image/x-icon">
+    <link href="http://localhost:2368/apple-touch-icon-precomposed.png" rel="apple-touch-icon">
+
+    <link rel="stylesheet" type="text/css" href="../assets/css/uno.css?v=86ac6b006d">
+
+    <link rel="canonical" href="http://www.devenable.com/proof-of-concept-common-mobile-services-client-pcl/">
+    <meta name="referrer" content="no-referrer-when-downgrade">
+    <link rel="amphtml" href="http://www.devenable.com/proof-of-concept-common-mobile-services-client-pcl/amp/">
+    
+    <meta property="og:site_name" content="Stephen Kennedy">
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Proof of Concept - Common Mobile Services Client (PCL)">
+    <meta property="og:description" content="In this blog post I will describe the proof of concept code sharing going on in the common mobile client shared library (Portable Class Library). Creating the common library The basis of this blog post is Paul Batum's excellent tutorial on GitHub.  I am not going to regurgitate what he">
+    <meta property="og:url" content="http://www.devenable.com/proof-of-concept-common-mobile-services-client-pcl/">
+    <meta property="article:published_time" content="2014-05-28T12:27:57.000Z">
+    <meta property="article:modified_time" content="2014-10-07T07:52:05.000Z">
+    <meta property="article:tag" content="Xamarin">
+    
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Proof of Concept - Common Mobile Services Client (PCL)">
+    <meta name="twitter:description" content="In this blog post I will describe the proof of concept code sharing going on in the common mobile client shared library (Portable Class Library). Creating the common library The basis of this blog post is Paul Batum's excellent tutorial on GitHub.  I am not going to regurgitate what he">
+    <meta name="twitter:url" content="http://www.devenable.com/proof-of-concept-common-mobile-services-client-pcl/">
+    <meta name="twitter:label1" content="Written by">
+    <meta name="twitter:data1" content="Stephen Kennedy">
+    <meta name="twitter:label2" content="Filed under">
+    <meta name="twitter:data2" content="Xamarin">
+    
+    <script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "publisher": {
+        "@type": "Organization",
+        "name": "Stephen Kennedy",
+        "logo": "http://www.devenable.com/ghost/img/ghosticon.jpg"
+    },
+    "author": {
+        "@type": "Person",
+        "name": "Stephen Kennedy",
+        "url": "http://www.devenable.com/author/stephen-kennedy/",
+        "sameAs": []
+    },
+    "headline": "Proof of Concept - Common Mobile Services Client (PCL)",
+    "url": "http://www.devenable.com/proof-of-concept-common-mobile-services-client-pcl/",
+    "datePublished": "2014-05-28T12:27:57.000Z",
+    "dateModified": "2014-10-07T07:52:05.000Z",
+    "keywords": "Xamarin",
+    "description": "In this blog post I will describe the proof of concept code sharing going on in the common mobile client shared library (Portable Class Library). Creating the common library The basis of this blog post is Paul Batum&#x27;s excellent tutorial on GitHub.  I am not going to regurgitate what he",
+    "mainEntityOfPage": {
+        "@type": "WebPage",
+        "@id": "http://www.devenable.com"
+    }
+}
+    </script>
+
+    <meta name="generator" content="Ghost 0.11">
+    <link rel="alternate" type="application/rss+xml" title="Stephen Kennedy" href="http://www.devenable.com/rss/">
+
+</head>
+<body class="post-template tag-xamarin no-js">
+
+    <span class="mobile btn-mobile-menu">
+        <i class="icon icon-list btn-mobile-menu__icon"></i>
+        <i class="icon icon-x-circle btn-mobile-close__icon hidden"></i>
+    </span>
+
+    <header class="panel-cover panel-cover--collapsed ">
+  <div class="panel-main">
+
+    <div class="panel-main__inner panel-inverted">
+    <div class="panel-main__content">
+
+        <h1 class="panel-cover__title panel-title"><a href="http://www.devenable.com" title="link to homepage for Stephen Kennedy">Stephen Kennedy</a></h1>
+        <hr class="panel-cover__divider">
+        <p class="panel-cover__description">Software engineer in the Microsoft technology stack, focusing on native and high-scale systems development.  Works for Readify.</p>
+        <hr class="panel-cover__divider panel-cover__divider--secondary">
+
+        <div class="navigation-wrapper">
+
+          <nav class="cover-navigation cover-navigation--primary">
+            <ul class="navigation">
+              <li class="navigation__item"><a href="../index.html#blog" title="link to Stephen Kennedy blog" class="blog-button">Blog</a></li>
+            </ul>
+          </nav>
+
+          
+<nav class="cover-navigation navigation--social">
+  <ul class="navigation">
+
+
+  <!-- Twitter -->
+  <li class="navigation__item">
+    <a href="http://twitter.com/daleanthony" title="@DaleAnthony on Twitter">
+      <i class="icon icon-social-twitter"></i>
+      <span class="label">Twitter</span>
+    </a>
+  </li>
+
+    <!-- Dribbble -->
+    <li class="navigation__item">
+      <a href="http://dribbble.com/daleanthony" title="Dale-Anthony on Dribbble">
+        <i class="icon icon-social-dribbble"></i>
+        <span class="label">Dribbble</span>
+      </a>
+    </li>
+
+    <!-- Email -->
+    <li class="navigation__item">
+      <a href="mailto:hello@daleanthony.com" title="Email hello@daleanthony.com">
+        <i class="icon icon-mail"></i>
+        <span class="label">Email</span>
+      </a>
+    </li>
+
+    <!-- RSS -->
+    <li class="navigation__item">
+      <a href="../rss/index.rss" title="Subscribe">
+        <i class="icon icon-rss"></i>
+        <span class="label">RSS</span>
+      </a>
+    </li>
+
+  </ul>
+</nav>
+
+        </div>
+
+      </div>
+
+    </div>
+
+    <div class="panel-cover--overlay"></div>
+  </div>
+</header>
+    <div class="content-wrapper">
+        <div class="content-wrapper__inner">
+            
+
+  <article class="post-container post-container--single">
+
+    <header class="post-header">
+      <div class="post-meta">
+        <time datetime="28 May 2014" class="post-meta__date date">28 May 2014</time> • <span class="post-meta__tags tags">on <a href="../tag/xamarin/">Xamarin</a></span>
+        <!--<span class="post-meta__author author"><img src="" alt="profile image for Stephen Kennedy" class="avatar post-meta__avatar" /> by Stephen Kennedy</span>-->
+      </div>
+      <h1 class="post-title">Proof of Concept - Common Mobile Services Client (PCL)</h1>
+    </header>
+
+    <section class="post tag-xamarin">
+      <p class="intro">In this blog post I will describe the <a href="../xamarin-android-with-azure-mobile-services-net-blog-series/">proof of concept</a> code sharing going on in the common mobile client shared library (Portable Class Library).</p>
+
+<h2 id="creatingthecommonlibrary">Creating the common library</h2>
+
+<p>The basis of this blog post is Paul Batum's <a href="https://github.com/paulbatum/mobile-services-xamarin-pcl">excellent tutorial</a> on GitHub.  I am not going to regurgitate what he has, but I will add a few things.</p>
+
+<ul>
+<li>You do not need to download the mobile services sample from Azure.
+<ul><li>Create a PCL project in Xamarin Studio (or Visual Studio), ensure that it is a PCL project, not a regular C# (or F#) library.</li>
+<li>Add the Nuget package Microsoft.Net.Http</li>
+<li>Follow the rest of the steps in the tutorial</li></ul></li>
+<li>Originally I had an older PCL project before I started to refactor my code to share the Azure Mobile Services client logic.  After following the instructions I was getting compile errors complaining that it could not find the IDisposable interface in version 4.0 of the .Net framework.  This was a <a href="http://stackoverflow.com/questions/20688379/monodroid-with-windows-azure-mobile-services-system-runtime-reference-error">bug</a> that has since been fixed, however, it looks like the bug was to do with the csproj, not VS/Xamarin Studio, so either create a new project like I did, or if that is not feasible, look at project file in the tutorial and do a diff.</li>
+<li>I didn't need to follow the WP8 instructions.  I just needed to add the appropriate Nuget packages.</li>
+<li>I will go through this in the iOS tutorial, but you for that platform you need to call CurrentPlatform.Init()</li>
+</ul>
+
+<hr>
+
+<h2 id="thecode">The code</h2>
+
+<pre><code class="language-prettyprint lang-cs">public interface IDataClient  
+{
+    Task&lt; IEnumerable &lt;InternetLocation &gt;&gt; GetLocations( double latitude,  double longitude);
+}
+</code></pre>
+
+<pre><code class="language-prettyprint lang-cs">public class DataClient : IDataClient  
+{
+    private readonly MobileServiceClient _client = newMobileServiceClient ("https://yourmobileservice.azure-mobile.net/" ,"xxKEYxx" );
+
+    public Task&lt; IEnumerable &lt;InternetLocation &gt;&gt; GetLocations( double latitude, double longitude)
+    {
+        return _client.GetTable&lt; InternetLocation &gt;().WithParameters(
+                            new Dictionary &lt;string , string &gt;
+                           {
+                                  { "longitude" , longitude.ToString(CultureInfo .InvariantCulture)},
+                                  { "latitude" , latitude.ToString(CultureInfo .InvariantCulture)}
+                           }).ToEnumerableAsync();
+    }
+}
+</code></pre>
+
+<p>Obviously replace the URL and key with your own.  The code here is pretty straight forward.  If you go back to my <a href="../azure-mobile-services-mapped-tablecontroller/">TableController blog post</a> it will call the GetLocationsNear method on the InternetLocationController using the passed in longitude and latitude.  </p>
+
+<hr>
+
+<h2 id="waitshouldnttherebemorecommoncode">Wait, shouldn't there be more common code?</h2>
+
+<p>At this point you may be wondering why there isn't more code sharing going on.  In terms of illustrating code sharing this proof of concept may have been a poor choice, as I will illustrate in future blog posts the mapping functionality by its nature (and the nature of the platforms) is very view specific which is where you need to craft platform specific code.</p>
+
+<p><a href="https://github.com/MvvmCross/MvvmCross">MvvmCross</a> and <a href="https://github.com/xamarin/Xamarin.Mobile">Xamarin.Mobile</a> allow you to use a common location component.  While for my proof of concept I did not go down this route, it is certainly available to you.</p>
+
+<p>Hopefully though, even with this small example, you will start to see the power of what Xamarin offers.</p>
+
+<blockquote>
+  <p><strong>Update:</strong>  Xamarin just announced <a href="http://xamarin.com/forms">Xamarin.Forms</a> which has a maps control.  Looking at the sample code, however, at the moment it only supports pins.  You will need to install the Nuget package (Xamarin.Forms.Maps) to get the maps installed.  At present the sample doesn't support Android due to a Google Maps API key dependency.  The sample can be found <a href="https://github.com/xamarin/xamarin-forms-samples/tree/master/FormsGallery">here</a>.</p>
+</blockquote>
+
+<hr>
+    </section>
+
+  </article>
+
+
+
+
+            <footer class="footer">
+    <span class="footer__copyright">© 2016. All rights reserved.</span>
+    <span class="footer__copyright"><a href="http://uno.daleanthony.com" title="link to page for Uno Ghost theme">Uno theme</a> by <a href="http://daleanthony.com" title="link to website for Dale-Anthony">Dale-Anthony</a></span>
+    <span class="footer__copyright">Proudly published with <a href="http://ghost.org" title="link to Ghost website">Ghost</a></span>
+</footer>        </div>
+    </div>
+
+    <!-- You can safely delete this line if your theme does not require jQuery -->
+<script type="text/javascript" src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
+
+    <script type="text/javascript" src="../assets/js/main.js?v=86ac6b006d"></script>
+	<script type="text/javascript" src="http://google-code-prettify.googlecode.com/svn/loader/run_prettify.js"></script>
+</body>

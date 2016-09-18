@@ -1,0 +1,1373 @@
+<rss xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:media="http://search.yahoo.com/mrss/" version="2.0"><channel><title>Stephen Kennedy</title><description>Software engineer in the Microsoft technology stack, focusing on native and high-scale systems development.  Works for Readify.</description><link>http://www.devenable.com/</link><generator>Ghost 0.11</generator><lastBuildDate>Sun, 18 Sep 2016 03:07:04 GMT</lastBuildDate><atom:link href="http://www.devenable.com/rss/" rel="self" type="application/rss+xml"/><ttl>60</ttl><item><title>Six Months of Akka.NET</title><description>&lt;p class="intro"&gt;I've been using Akka.NET in a real-world commercial project for a large organisation that operates in the finance industry.  This project has been in development for 6 months now.  I've wrapped up some of my thoughts on the technology / actor model in this post.&lt;/p&gt;
+
+&lt;h1 id="conclusion"&gt;Conclusion&lt;/h1&gt;
+
+&lt;p&gt;&lt;em&gt;As Akka.NET is&lt;/em&gt;&lt;/p&gt;</description><link>http://www.devenable.com/six-months-of-akka-net/</link><guid isPermaLink="false">f5591420-bfb7-4b08-8996-300eb6f7269b</guid><dc:creator>Stephen Kennedy</dc:creator><pubDate>Tue, 16 Feb 2016 21:34:48 GMT</pubDate><content:encoded>&lt;p class="intro"&gt;I've been using Akka.NET in a real-world commercial project for a large organisation that operates in the finance industry.  This project has been in development for 6 months now.  I've wrapped up some of my thoughts on the technology / actor model in this post.&lt;/p&gt;
+
+&lt;h1 id="conclusion"&gt;Conclusion&lt;/h1&gt;
+
+&lt;p&gt;&lt;em&gt;As Akka.NET is a framework, most people are interested in how it sits as a whole, before drilling into specifics.  Much of what I've found can probably be applied to other actor model implementations such as Orleans.&lt;/em&gt;&lt;/p&gt;
+
+&lt;p&gt;I really liked the framework.  &lt;/p&gt;
+
+&lt;p&gt;Much like my first foray's into F#, Akka.NET allows you to solve problems in a different way.  Much of Akka.NET's benefits are 'publicised' arounds it clustering capabilities.  And while these are certainly apparent and useful, it is the design patterns that you can create and use that is really what makes me excited about the actor model and this technology.&lt;/p&gt;
+
+&lt;p&gt;I did find it made automated unit testing harder, and its highly decoupled approach did have an impact on cohesiveness.  It also comes with a large learning curve, particularly those new to actor model and unfamiliar with message-based or event-driven design patterns.  &lt;/p&gt;
+
+&lt;p&gt;There is also some level of architectural / design investment in using the framework properly, so like any tool, you are going to want to use it wisely.&lt;/p&gt;
+
+&lt;p&gt;I wouldn't use Akka.NET on every project.  And I'd certainly consider alternate actor model implementations based on the project.  However, I definitely will continue to invest my time in the technology based on my experiences with it to date.&lt;/p&gt;
+
+&lt;p&gt;If you want to learn more about Akka.NET, I highly, highly, recommend Petabridge's &lt;a href="https://github.com/petabridge/akka-bootcamp"&gt;free bootcamp&lt;/a&gt;.  &lt;/p&gt;
+
+&lt;h1 id="randomthoughts"&gt;Random thoughts&lt;/h1&gt;
+
+&lt;p&gt;I'm not going to discuss all of the benefits of Akka, Akka.NET, and the actor model.  There is plenty of content that can be found online for this.  What I am going to talk about are some of the less obvious things that I discovered.&lt;/p&gt;
+
+&lt;h3 id="decoupleme"&gt;Decouple me&lt;/h3&gt;
+
+&lt;p&gt;Akka.NET is highly decoupled.  &lt;/p&gt;
+
+&lt;p&gt;Actors generally communicate or associate through an IActorRef (or equivilent).  Which means you can only tell (fire and forget) or ask (request and response) them something.  This IActorRef is a proxy, so you can't even directly access or cast to that actor, even if it exists in the same process.&lt;/p&gt;
+
+&lt;p&gt;Really great for testing, seperating concerns, and aggregating.  Unfortunately, in larger codebases it can make the code less cohesive, and you often find yourself looking at message types in order to figure out the flow of the system.  Not a deal-breaker with a sensible design though.&lt;/p&gt;
+
+&lt;h3 id="thedoubleedgedconcurrencymodel"&gt;The double-edged concurrency model&lt;/h3&gt;
+
+&lt;p&gt;One of the salient points of Akka.NET is its concurrency model.&lt;/p&gt;
+
+&lt;p&gt;Each Akka.NET actor has two messages queues in front of it (one for user messages, one for system messages).  Akka.NET guarantees that an actor can only process one message at a time.&lt;/p&gt;
+
+&lt;p&gt;This simplifies application logic, because you no longer need to concern yourself with concurrency protection when executing code inside an actor.  You can concentrate on the domain, and the business logic.&lt;/p&gt;
+
+&lt;p&gt;However, given that in Akka.NET everything is concurrent by default it does make automated testing more difficult.  Thankfully Akka.NET comes with a &lt;a href="http://codingjourneyman.com/2015/07/08/testing-akkanet-actors-with-akka-testkit/"&gt;TestKit&lt;/a&gt;, which makes unit tests much simpler to write, and more reliable.  Unfortunately, in my experience, once you have a large suite of automated  tests, you can sometimes get random test failures.  This is more likely to occur in tests involving a scheduler (or TestScheduler) and in tests that are closer to integration tests, rather than unit tests.  &lt;/p&gt;
+
+&lt;p&gt;Kids, this is why you should avoid writing code that that potentially spawns a background thread, assuming you want to test it of course.&lt;/p&gt;
+
+&lt;p&gt;&lt;em&gt;Note:&lt;/em&gt; I've not yet invested enough time in trying to track down why we get these random failures, it might be that we need to change the dispatcher.  But, in our experience, the problems with testing are not easy and apparent to fix.&lt;/p&gt;
+
+&lt;h3 id="finitestatemachineallthethings"&gt;Finite state machine all the things&lt;/h3&gt;
+
+&lt;p&gt;I love Akka.NET's &lt;a href="http://getakka.net/docs/working-with-actors/Switchable%20Behaviors"&gt;Become&lt;/a&gt; method.  &lt;/p&gt;
+
+&lt;p&gt;It simplifies what would ordinarily be complicated actors, and makes it much easier to reason about their purpose and functionality.&lt;/p&gt;
+
+&lt;p&gt;One of the main ways we used this method is to make an actor available to receive messages, while it isn't ready to process them.  We make a request to another actor to get the data that this actor needs in order to process messages.  Any messages that aren't related to the loading of the actor are stashed, until the actor is ready to process messages.  (Which is another call to Become, in order to switch the actors state)&lt;/p&gt;
+
+&lt;p&gt;One of my favourite features of Akka.NET.&lt;/p&gt;
+
+&lt;h3 id="distributedcomputingisstillhard"&gt;Distributed computing is still hard&lt;/h3&gt;
+
+&lt;p&gt;Okay, this one wasn't really a surprise.  &lt;/p&gt;
+
+&lt;p&gt;I just wanted to point out than even though the tooling gives you a great framework to operate from, you are still going to have to be aware of, and consider the usual suspects, such as consensus, message delivery guarantees, network partitions, and any other sorts of failures.&lt;/p&gt;
+
+&lt;p&gt;You're also going to have to consider performance, particularly in regards to network IO.  The Akka.NET team could write the best networking code in the world, but if your communication is very chatty or contains large message payloads, it ain't going to matter.&lt;/p&gt;
+
+&lt;h3 id="locationtransparencyisalie"&gt;Location transparency is a lie&lt;/h3&gt;
+
+&lt;p&gt;Okay, not entirely.  &lt;/p&gt;
+
+&lt;p&gt;It is true that when all you have is an IActorRef to another actor you have no idea (nor should you care) if that actor exists in the same process, or on a different process.  It still gives the same powerful scalability benefits, but there are a few less obvious gotcha's.&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Actor selection only by default only works within the local actor system (i.e. same process).  You can still do selection across a cluster with a grouped router, but it isn't as idiomatic.
+&lt;ul&gt;&lt;li&gt;You can use actor selection remotely, however, you need to know the remote host endpoint.&lt;/li&gt;&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;When creating actors through props, those props need to be serialisable.&lt;/li&gt;
+&lt;li&gt;You often consider the messaging and interaction between actors for performance reasons before potentially remotely deploying or communicating over the cluster.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id="stateisnolongerevil"&gt;State is no longer evil&lt;/h3&gt;
+
+&lt;p&gt;Web applications are a staple of software development.  HTTP is inherently stateless, however, applications are inherently stateful.  &lt;/p&gt;
+
+&lt;p&gt;As developers we try to bridge this gap using constructs such as session state and cookies.  In my view, these are hacks.  They cause all sorts of problems, in terms of performance and scale.  &lt;/p&gt;
+
+&lt;p&gt;Typical n-tier architecture and design revolves around using a database as a backing store to persist state.  These constraints limit solution design, and introduce bottlenecks in the system.  &lt;/p&gt;
+
+&lt;p&gt;&lt;a href="https://petabridge.com/blog/stateful-web-applications/"&gt;This blog post&lt;/a&gt; talks about how one might implement stateful web applications with the actor model. &lt;/p&gt;
+
+&lt;h3 id="designpatternareus"&gt;Design pattern are us&lt;/h3&gt;
+
+&lt;p&gt;The actor model opens up some really cool design patterns, opening up many of the message-based patterns you can read about.  &lt;/p&gt;
+
+&lt;p&gt;The ease at which you can implement patterns such as pub / sub and message aggregation patterns lets you solve problems in a different manner to how you probably typically would.&lt;/p&gt;
+
+&lt;p&gt;For example, in a typical application independent isolated HTTP requests might load a product with a particular identity.  One of the patterns we came up was to aggregate these individual requests for data into one, to send to SQL.  This limits the overhead on the database as one larger call is generally better performance than lots of small calls.&lt;/p&gt;
+
+&lt;h3 id="actorshaveidentity"&gt;Actors have identity&lt;/h3&gt;
+
+&lt;p&gt;Akka.NET has its own protocol, akka.tcp.  Like the HTTP protocol that your browser knows how to interact with, the Akka.NET framework also knows how to interact with this protocol.  You can communicate with actors across the cluster that you have not established any prior direct communication with. &lt;/p&gt;
+
+&lt;p&gt;It also means that you can host your entities on the actor system.  Entities that store and track state, such as inventory, can be accessed with concurrency protection across the cluster.  Fast in-memory access can modify that state, while writes to persistant storage can happen asynchronously as the response is sent back to the requestor.&lt;/p&gt;
+
+&lt;h3 id="clusterit"&gt;Cluster it&lt;/h3&gt;
+
+&lt;p&gt;Akka.NET's clustering is great.  It works as advertised, and you have a lot of power and flexibility in how you deal with the cluster.&lt;/p&gt;
+
+&lt;p&gt;Unlike Orleans you do need to think a lot more about how you are going to distribute work and the messaging interaction as it involves less magic.  Depending on the solution you are developing, this may, or may not, be a good thing.&lt;/p&gt;
+
+&lt;p&gt;There are a couple of tricky spots when you deal with clustering. &lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Sometimes the actor may not be ready to receive messages immediately after remotely deployment of an actor, so you may want to introduce some sort of acknowledgement message for when the actor is up and ready to accept messages.&lt;/li&gt;
+&lt;li&gt;Akka.NET's default serialisation is Protobuf for Akka.NET's well known message types, and JSON for your own application messages.  Sometimes when there is a serialisation exception it is difficult to figure out which message type is causing the serialisation problem as you get a fairly vanilla stack trace from JSON.Net.&lt;/li&gt;
+&lt;/ul&gt;</content:encoded></item><item><title>Company Backed Open Source</title><description>&lt;p class="intro"&gt;What are realistic expectations to have around open source software backed by well known technology companies?&lt;/p&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;This blog post was originally going to be part of a much larger post discussing the failover gap with the 'full Microsoft Redis'.  The details of that can be found in a previous post&lt;/p&gt;&lt;/blockquote&gt;</description><link>http://www.devenable.com/company-backed-open-source/</link><guid isPermaLink="false">4d3775c3-92ae-4fa0-ba89-6d88e5287bb9</guid><category>Redis</category><category>Microsoft</category><category>Open Source</category><dc:creator>Stephen Kennedy</dc:creator><pubDate>Wed, 15 Apr 2015 10:52:06 GMT</pubDate><content:encoded>&lt;p class="intro"&gt;What are realistic expectations to have around open source software backed by well known technology companies?&lt;/p&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;This blog post was originally going to be part of a much larger post discussing the failover gap with the 'full Microsoft Redis'.  The details of that can be found in a previous post &lt;a href="https://www.devenable.com/microsofts-redis-implementation-mind-the-gap/"&gt;here&lt;/a&gt;.  As such while the content focuses largely on Redis it is probably applicable in other areas.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;h2 id="beforeibegin"&gt;Before I begin&lt;/h2&gt;
+
+&lt;p&gt;This is not a criticism of Microsoft Open Technologies, StackExchange, Marc Gravell, or any open source contributor.  I am immensely grateful for the lengths that these individuals and organizations go to in order to make our lives as developers and technology enthusiasts easier / better.&lt;/p&gt;
+
+&lt;p&gt;Also, I've not used it, but &lt;a href="http://www.alachisoft.com/ncache/"&gt;NCache&lt;/a&gt; but it is a commercial option with open source licensing (and no support).  I've conveniently left it out of this post, but it is an option to consider if you are looking at caching technologies on the .Net framework.  Likewise, there is a &lt;a href="https://github.com/ServiceStack/ServiceStack.Redis"&gt;ServiceStack client&lt;/a&gt; that looks to have Sentinel support if you are willing to pay.&lt;/p&gt;
+
+&lt;h2 id="brandedtechnology"&gt;Branded technology&lt;/h2&gt;
+
+&lt;p&gt;Most Microsoft developers would appreciate the tooling support that Microsoft offers in its products.  Visual Studio is highly regarded and many organisations choose to leverage Microsoft technologies because they allow developers to focus on business solutions.  Microsoft has earned a certain level of trust based on their product history.&lt;/p&gt;
+
+&lt;p&gt;While Microsoft's Redis is an open source project it is still &lt;em&gt;perceived&lt;/em&gt; (subsidary or not) as being a Microsoft produced technology.&lt;/p&gt;
+
+&lt;p&gt;As such I think there is a bit of an issue with Microsoft's Redis story and it wasn't immediately obvious.  &lt;/p&gt;
+
+&lt;h2 id="outofthebox"&gt;Out of the box&lt;/h2&gt;
+
+&lt;p&gt;Most organizations prefer a solution that just work 'out of the box'.  (After all in software there is always some level of integration involved)&lt;/p&gt;
+
+&lt;p&gt;Microsoft did have a caching solution that largely worked out of the box and it was called AppFabric.  But the writing has been on the wall for a while now in regards to AppFabric's future when Microsoft effectively replaced it with Redis on Azure.  &lt;/p&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;Microsoft has recently announced that Windows Server AppFabric is going to &lt;a href="http://blogs.msdn.com/b/appfabric/archive/2015/04/02/windows-server-appfabric-1-1-ends-support-4-2-2016.aspx"&gt;end of support&lt;/a&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;Microsoft has been talking up Redis (and offering it as part of the Azure infrastructure) for a while now on the Azure platform.  So the move to Redis on self-hosted platforms for many organizations that leverage Microsoft technologies must seem like an easy choice.&lt;/p&gt;
+
+&lt;p&gt;Redis works fine on Azure during a failover as Microsoft's infrastructure is able to handle the node failure.  However, if you want to use Microsoft's session state provider (and thus inherit the StackExchange.Redis client) then you need to handle the failover yourself.  See my &lt;a href="https://www.devenable.com/microsofts-redis-implementation-mind-the-gap/"&gt;previous blog post&lt;/a&gt; for more detail.&lt;/p&gt;
+
+&lt;h2 id="theintegrationbreakdown"&gt;The integration breakdown&lt;/h2&gt;
+
+&lt;p&gt;This issue would not have occured if one of the following occurred.&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Microsoft's Redis implementation supported Redis 3.0.0.  (StackExchange.Redis supports Redis Cluster)&lt;/li&gt;
+&lt;li&gt;The StackExchange.Redis client supported handling Redis Sentinel's pub/sub channel for switch-master messages.
+&lt;ul&gt;&lt;li&gt;The client supports listening to Redis's pub/sub channel but you need to write your own logic to explicitly listen to and handle these messages.&lt;/li&gt;
+&lt;li&gt;In addition Microsoft's Redis session state provider would need to support this functionality as well (assuming it needed to be configuration driven).&lt;/li&gt;&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;Microsoft had their own Redis client that supported the Redis Sentinel functionality they themselves have written for Redis.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Okay there are a number of organizations (contributors) involved here.  &lt;/p&gt;
+
+&lt;p&gt;Marc Gravell (the StackExchange Redis client author) admits it &lt;a href="https://groups.google.com/forum/#!topic/redis-db/sf0oIO-CIa4"&gt;doesn't have good support&lt;/a&gt; for Sentinel.  His reason if you look at that link and dig for other posts is that StackExchange doesn't use Sentinel so he'd have to spend his own personal time (which he also devotes to other open source projects) and he doesn't feel comfortable enough about Sentinel to commit to it.  This is both fair and reasonable.&lt;/p&gt;
+
+&lt;p&gt;The version of Redis Microsoft uses on Azure is 2.8.* (Sorry, I'm too lazy to spin up an Azure Redis cluster just to verison check it).  So I suspect (no proof) that they are using some variant of the Microsoft Open Technologies version of Redis and 2.8 is enough for Azure.  That is, at least, until customers start wanting sharding on Redis clusters. &lt;/p&gt;
+
+&lt;h2 id="forsomeopensourceisjourney"&gt;For some, open source is journey&lt;/h2&gt;
+
+&lt;p&gt;Certain organizations shy away from open source software.  They don't completely trust it, and this is despite having full access to the source code.  They don't want to be ultimately responsible / accountable if there any bugs or issues that arise from using that software.  This is why even when products (such as NCache) are available and free  for commercial use some organizations will pay often at times expensive licensing fees just for that support.&lt;/p&gt;
+
+&lt;p&gt;Large organizations such as Microsoft, GitHub, and Facebook are &lt;em&gt;immensely&lt;/em&gt; important when it comes to getting the wider software community behind open source software.&lt;/p&gt;
+
+&lt;p&gt;That being said, many organizations assume that they are going to get the same level of full 'out of the box' solution that they might get for a licensed product from these vendors.  And when that doesn't happen it can:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Damage the vendors brand.&lt;/li&gt;
+&lt;li&gt;Be used as an excuse to avoid open source software.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Now, I'm not saying that this is fair or right, but this something that does happen.&lt;/p&gt;
+
+&lt;h2 id="butyouremissingthepointofopensource"&gt;But you're missing the point of open source&lt;/h2&gt;
+
+&lt;p&gt;No, I get it.  The proper resolution to this problem is that either myself or the client that I am working for write a solution and submit a pull request.  If I can find the time to write a more generic solution (in C#) that Marc Gravell (StackExchange.Redis author) is comfortable with accepting I just might do that.&lt;/p&gt;
+
+&lt;h2 id="tldr"&gt;TLDR&lt;/h2&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Each of the different organizations involved in this developed a solution to meet their needs, but there is a failover gap on Windows Redis with the Microsoft Redis session state provider (with a dependency on the StackExchange.Redis client).&lt;/li&gt;
+&lt;li&gt;The large technology companies are immensely important when it comes to getting organizations over the line with open source.  I know I've seen a massive sea change in software practices since Microsoft became more open source friendly.  (Note:  Obviously they are not the only vendor doing this)&lt;/li&gt;
+&lt;li&gt;Expectations around open source software can and should be different from commercial products.  But, rightly or wrongly, when a big vendor is behind an open source technology and it doesn't meet the expections of an organization it can be used as an excuse against open source.&lt;/li&gt;
+&lt;li&gt;When you effectively deprecate a technology in favour of another, you should ensure that all major features of the old technology retain parity in some way with the new, and that includes failover.&lt;/li&gt;
+&lt;/ul&gt;</content:encoded></item><item><title>Microsoft's Redis Implementation - Mind the Gap</title><description>&lt;p class="intro"&gt;Lesson's learnt Redis on Windows.&lt;/p&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;Originally I had this as one big blog post, but I've decided to split it up into the technical issues and conjecture.  See part 2 &lt;a href="http://www.devenable.com/company-backed-open-source/"&gt;here&lt;/a&gt;.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;h2 id="redismicrosoftopentechnologies"&gt;Redis - Microsoft Open Technologies&lt;/h2&gt;
+
+&lt;p&gt;Microsoft Open Technologies, a subsidary of Microsoft, has a &lt;a href="https://msopentech.com/opentech-projects/redis/"&gt;port&lt;/a&gt; of the popular &lt;a href="http://redis.io"&gt;Redis&lt;/a&gt;&lt;/p&gt;</description><link>http://www.devenable.com/microsofts-redis-implementation-mind-the-gap/</link><guid isPermaLink="false">c007d2cb-c14f-4e1e-80a6-4e72a13bdd4a</guid><category>Redis</category><dc:creator>Stephen Kennedy</dc:creator><pubDate>Wed, 15 Apr 2015 10:46:00 GMT</pubDate><content:encoded>&lt;p class="intro"&gt;Lesson's learnt Redis on Windows.&lt;/p&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;Originally I had this as one big blog post, but I've decided to split it up into the technical issues and conjecture.  See part 2 &lt;a href="http://www.devenable.com/company-backed-open-source/"&gt;here&lt;/a&gt;.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;h2 id="redismicrosoftopentechnologies"&gt;Redis - Microsoft Open Technologies&lt;/h2&gt;
+
+&lt;p&gt;Microsoft Open Technologies, a subsidary of Microsoft, has a &lt;a href="https://msopentech.com/opentech-projects/redis/"&gt;port&lt;/a&gt; of the popular &lt;a href="http://redis.io"&gt;Redis&lt;/a&gt; database.  A client I am currently consulting for was looking at changing from an in-memory session state provider to an out-of-process session state provider and Redis was chosen as the initial provider.&lt;/p&gt;
+
+&lt;h2 id="bewarethefeaturegap"&gt;Beware the feature gap&lt;/h2&gt;
+
+&lt;p&gt;The latest official version of Redis is 3.0.0.  The latest stable version of Redis that runs on Windows (provided by Microsoft Open Technologies) is version 2.8.19.&lt;/p&gt;
+
+&lt;p&gt;Much of what you read online will be on the latest version of Redis available, so make sure you consider the version of Redis that the documentation relates to when making decisions.  &lt;/p&gt;
+
+&lt;p&gt;So what is the gap between the two versions?  &lt;strong&gt;Redis Cluster&lt;/strong&gt;.&lt;/p&gt;
+
+&lt;p&gt;Now, before you go whacking the panic button it isn't as bad as it sounds.  The earlier versions of Redis (including the Windows variant) do offer clustering, it is just that the failover handling is done in a different way.&lt;/p&gt;
+
+&lt;h2 id="failoveroptions"&gt;Failover options&lt;/h2&gt;
+
+&lt;p&gt;Aside from data sharding, the other big feature of Redis Cluster is how it handles failover.  Here are the options that are available to you. &lt;/p&gt;
+
+&lt;h3 id="rediscluster"&gt;Redis Cluster&lt;/h3&gt;
+
+&lt;p&gt;Redis Cluster (Redis 3.0) is essentially self managing.  The nodes of the cluster will look after themselves and propogate masters in the event of failover.  If a client attempts to talk to a master that has since recycled into a readonly slave it will received a MOVED failure message.&lt;/p&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;&lt;strong&gt;Note:&lt;/strong&gt; This is my interpretation of the &lt;a href="http://redis.io/topics/cluster-tutorial"&gt;Redis Cluster&lt;/a&gt; documentation.  Take what I've said with a pinch of salt :).&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;h3 id="redissentinel"&gt;Redis Sentinel&lt;/h3&gt;
+
+&lt;p&gt;Redis Sentinel is available to you with the Windows port of Redis.  You run it using the redis-server executable, but with a --sentinel command switch.  &lt;/p&gt;
+
+&lt;p&gt;I'm not going to go into too much detail as to how it works as the &lt;a href="http://redis.io/topics/sentinel"&gt;official documentation&lt;/a&gt; explains this well.&lt;/p&gt;
+
+&lt;p&gt;But there are two key differences with Redis Cluster.&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;It is not a self-managed cluster, you need to run a seperate set of processes in order to monitor cluster health.  &lt;/li&gt;
+&lt;li&gt;In order for a client to know that a new master has been promoted it needs to subscribe to switch-master messages published by Sentinel.  The client then needs to use this new master.&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h3 id="infrastructure"&gt;Infrastructure&lt;/h3&gt;
+
+&lt;p&gt;You could potentially use products such as VMWare Fault Tolerance and thus take the responsibility away from the client code.  Microsoft Azure uses Redis 2.8./* and this is probably the approach they took in regards to handling fault tolerance.&lt;/p&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;&lt;strong&gt;Important Note:&lt;/strong&gt;  For that reason this only an issue for self-hosted Redis deployments.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;h3 id="bigredbutton"&gt;Big red button&lt;/h3&gt;
+
+&lt;p&gt;This is the approach that StackExchange take through their &lt;a href="https://github.com/opserver/Opserver"&gt;Opserver&lt;/a&gt; tool.  According to &lt;a href="http://meta.stackexchange.com/questions/230366/how-does-stack-exchange-work-around-the-lack-of-redis-clustering"&gt;this post&lt;/a&gt; on Stack Exchange (which is a year old) they hit the 'big red button' when they notice a failover.  &lt;/p&gt;
+
+&lt;h2 id="netclientside"&gt;.Net clientside&lt;/h2&gt;
+
+&lt;p&gt;There are two main libraries available to .Net developers when interacting with Redis.  The &lt;a href="https://github.com/StackExchange/StackExchange.Redis.git"&gt;StackExchange.Redis&lt;/a&gt; client and the &lt;a href="https://github.com/ServiceStack/ServiceStack.Redis"&gt;ServiceStack&lt;/a&gt; client.&lt;/p&gt;
+
+&lt;p&gt;ServiceStack is a commercial product but it looks to have Sentinel support.&lt;/p&gt;
+
+&lt;p&gt;If your organization doesn't want to shell out for ServiceStack then you're probably going to need to look at the StackExchange.Redis client.  This is the client API that Microsoft have chosen for their &lt;a href="https://www.nuget.org/packages/Microsoft.Web.RedisSessionStateProvider/"&gt;session state provider&lt;/a&gt;.  The library has a dependency on the strongly named StackExchange.Redis provider.  &lt;/p&gt;
+
+&lt;p&gt;The diagram below illustrates the between dependencies if you want to use Microsoft's session state provider.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://www.devenable.com/content/images/2015/04/Redis-Session-State-2.png" alt=""&gt;&lt;/p&gt;
+
+&lt;h2 id="thefailovergap"&gt;The failover gap&lt;/h2&gt;
+
+&lt;p&gt;There is an &lt;a href="https://github.com/StackExchange/StackExchange.Redis/issues/22"&gt;issue&lt;/a&gt; at present where the StackExchange library doesn't listen to the Sentinel pub/sub channel for master promotion in the event of a failover.  In the event of a failover the Redis client will continue to try and talk to a node that may now be a slave after being demoted.&lt;/p&gt;
+
+&lt;p&gt;This flows onto the Microsoft session state provider as on initialization it only reads from the web.config for the cache node connection strings.&lt;/p&gt;
+
+&lt;h2 id="pluggingthegap"&gt;Plugging the gap&lt;/h2&gt;
+
+&lt;p&gt;Don't want to use a fault tolerance products or hit a 'big red button'?  These options are still available to you.&lt;/p&gt;
+
+&lt;p&gt;If you are using Microsoft's session state provider then you are going to need to either write your own or inherit and override some of its behaviour.  Principally you are going to want it to connect to Sentinel in order to get the current master (as the web application may have just recycled) and you are also going to want to get from Sentinel what the current master is in the event of a failover.&lt;/p&gt;
+
+&lt;p&gt;This configuration from Sentinel should probably be stored in a seperate singleton configuration to be re-used by subsequent Redis connections.&lt;/p&gt;
+
+&lt;p&gt;In terms of actually figuring out when a new master has been promoted here are some avenues available to you.&lt;/p&gt;
+
+&lt;h4 id="listeningtosentinelspubsubchannel"&gt;Listening to Sentinel's pub/sub channel&lt;/h4&gt;
+
+&lt;p&gt;This is as per the &lt;a href="https://github.com/StackExchange/StackExchange.Redis/issues/22"&gt;issue&lt;/a&gt; I linked to earlier which will inform you on the subscription whenever Sentinel has promoted a new master. &lt;br&gt;
+I have personally not used this fix.  Also be aware that it will create a subscription per connection which is probably not ideal, particularly if you are using Microsoft's session state provider as it will create a StackExchange.Redis connection per provider instance.&lt;/p&gt;
+
+&lt;p&gt;If you only want to create one subscription per AppDomain then you'll need to run a background thread that runs indefinitely.  There are plenty of articles from Microsoft that state that this is not good practice.&lt;/p&gt;
+
+&lt;h4 id="exceptionhandling"&gt;Exception Handling&lt;/h4&gt;
+
+&lt;p&gt;You could handle and parse Redis exceptions picking out those that relate to a down (or demoted) master.  &lt;/p&gt;
+
+&lt;p&gt;There could be some restrictions in your topology here as you will want to know when you are communicating with a slave so you're probably going to want to ensure that all of your slaves are read-only (which is the default).&lt;/p&gt;
+
+&lt;p&gt;You may also want to consider limiting the number of requests for the current master from Sentinel when a potential failover has occurred.&lt;/p&gt;
+
+&lt;p&gt;This approach is likely to resolve in a longer period of time before the client (web application) recovers from a failover but doesn't involve having a backend process that watches the Sentinel pub/sub channel.&lt;/p&gt;
+
+&lt;h2 id="sowhereisthepullrequest"&gt;So where is the pull request?&lt;/h2&gt;
+
+&lt;p&gt;Here I am writing to 'complain' about valuable contributions made by many individuals to the development community often investing significant amounts of their own time.  Shouldn't I just fix it?  Isn't that, after all, the spirit of open source?&lt;/p&gt;
+
+&lt;p&gt;Chances are most of the work to resolve this can be done in the StackExchange client.  Once we've figured out how to solve this issue for our client I may create a more generic solution as a PR.  The only issue I have this stage (aside from available personal time) is that a more generic solution that doesn't involve having a subscription per Redis client instance is likely to involve a fairly significant PR.&lt;/p&gt;
+
+&lt;p&gt;But, for those intrepid adventurers that are starting (or have already started on) their Microsoft Redis journey be warned there is a gap to consider.&lt;/p&gt;
+
+&lt;p&gt;But isn't this all Microsoft's fault?  I go into the perceived issues in a seperate blog post as a kind-of &lt;a href="http://www.devenable.com/company-backed-open-source/"&gt;part 2&lt;/a&gt;.&lt;/p&gt;</content:encoded></item><item><title>Using LINQPad as a Redis Client</title><description>&lt;p class="intro"&gt;Want to inspect object graphs being stored in a Redis cache?  Use &lt;a href="https://www.linqpad.net/"&gt;LINQPad&lt;/a&gt;.&lt;/p&gt;
+
+&lt;h2 id="introduction"&gt;Introduction&lt;/h2&gt;
+
+&lt;p&gt;At my current client engagement we needed to look at what was being stored in the cache through &lt;a href="https://www.nuget.org/packages/Microsoft.Web.RedisSessionStateProvider/"&gt;Microsoft's session state provider&lt;/a&gt;.  Unfortunately at present the Redis UI tooling available doesn't have a good story when&lt;/p&gt;</description><link>http://www.devenable.com/using-linqpad-as-a/</link><guid isPermaLink="false">60b00bf4-e27d-441a-b121-79fc59fe2b8e</guid><category>Redis</category><dc:creator>Stephen Kennedy</dc:creator><pubDate>Sun, 29 Mar 2015 05:39:33 GMT</pubDate><content:encoded>&lt;p class="intro"&gt;Want to inspect object graphs being stored in a Redis cache?  Use &lt;a href="https://www.linqpad.net/"&gt;LINQPad&lt;/a&gt;.&lt;/p&gt;
+
+&lt;h2 id="introduction"&gt;Introduction&lt;/h2&gt;
+
+&lt;p&gt;At my current client engagement we needed to look at what was being stored in the cache through &lt;a href="https://www.nuget.org/packages/Microsoft.Web.RedisSessionStateProvider/"&gt;Microsoft's session state provider&lt;/a&gt;.  Unfortunately at present the Redis UI tooling available doesn't have a good story when inspecting data stored with the use of a BinaryFormatter.&lt;/p&gt;
+
+&lt;p&gt;One of LINQPad's many valuable features is that it does a very good job of letting you visualize object graphs.&lt;/p&gt;
+
+&lt;h2 id="thecode"&gt;The code&lt;/h2&gt;
+
+&lt;p&gt;The code for the LINQPad script I used can be found &lt;a href="https://gist.github.com/DevEnable/a20f55ecceb28d08dc79"&gt;here&lt;/a&gt;.  It is specific to inspecting session state with the script only looking at keys with a _Data suffix. &lt;/p&gt;
+
+&lt;p&gt;You will need to add references to the Microsoft Redis session state provider.  If you're licensed for the developer or premium edition then you can simply add the Nuget reference, otherwise, you will need to stick with standard  binary references.&lt;/p&gt;
+
+&lt;p&gt;Also, don't forget to include references to any types being stored in session, otherwise, the deserialisation will fail.&lt;/p&gt;
+
+&lt;p&gt;Finally, even if you aren't interested in looking at session state, you can easily modify the script to look at more general usage of the Redis cache.&lt;/p&gt;
+
+&lt;h2 id="whatitlookslike"&gt;What it looks like&lt;/h2&gt;
+
+&lt;p&gt;All through the magic of LINQPad -&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://www.devenable.com/content/images/2015/03/SessionCapture.PNG" alt=""&gt;&lt;/p&gt;
+
+&lt;h2 id="extendingthescript"&gt;Extending the script&lt;/h2&gt;
+
+&lt;p&gt;One thing I found really useful through the use of LINQPad was I could write code to analyse (reduce / map, filtering, etc) the data being stored in session, which is especially useful when there is a lot of noise.&lt;/p&gt;</content:encoded></item><item><title>Assessing Performance &amp; Scale with Serilog</title><description>&lt;p class="intro"&gt;We have performance profilers, text logs, and performance counters.  Does structured logging even have a place?&lt;/p&gt;
+
+&lt;h2 id="theproblem"&gt;The problem&lt;/h2&gt;
+
+&lt;p&gt;I am currently working for a client that is experiencing significant performance &amp;amp; scale issues - particularly around the interaction between the .Net application code and the database.  Their logic spawns across&lt;/p&gt;</description><link>http://www.devenable.com/assessing-performance-scale-with-serilog/</link><guid isPermaLink="false">842dd1f0-7826-4a69-bda0-378ba80ba580</guid><category>Serilog</category><category>Performance</category><category>Scale</category><dc:creator>Stephen Kennedy</dc:creator><pubDate>Sun, 08 Feb 2015 07:58:57 GMT</pubDate><content:encoded>&lt;p class="intro"&gt;We have performance profilers, text logs, and performance counters.  Does structured logging even have a place?&lt;/p&gt;
+
+&lt;h2 id="theproblem"&gt;The problem&lt;/h2&gt;
+
+&lt;p&gt;I am currently working for a client that is experiencing significant performance &amp;amp; scale issues - particularly around the interaction between the .Net application code and the database.  Their logic spawns across multiple threads, processes, and machines.  Depending on the context of what you are executing in (back-end process, web request) the logic and way the application goes about doing this can vary quite differently.  The codebase 'shows its age' with a large amount of technical debt.&lt;/p&gt;
+
+&lt;p&gt;We'd been there for a little while and were having difficulty gathering a picture of:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Where is the low hanging fruit?&lt;/li&gt;
+&lt;li&gt;What design issues were causing the biggest problems?&lt;/li&gt;
+&lt;li&gt;What areas could we provide the most value without introducing too much risk to the business?&lt;/li&gt;
+&lt;li&gt;How do we best illustrate to the stakeholders where these performance / scale issues are and the impact of not addressing them with a proper solution?&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;We had access to performance profilers, and they were great when examining something from a single viewpoint but as soon as you have multiple views and systems all interacting in the same ecosystem they lose a lot of value.  Finding bottlenecks and potential deadlock triggers is something that cannot be done in isolation.&lt;/p&gt;
+
+&lt;h2 id="thesolution"&gt;The solution&lt;/h2&gt;
+
+&lt;p&gt;My colleagues from &lt;a href="http://readify.net/"&gt;Readify&lt;/a&gt; came up with the idea of using &lt;a href="http://serilog.net/"&gt;Serilog&lt;/a&gt; which is a structured logger built using .Net.  This would allow us to put logging code across all of the infrastructural areas of the codebase and be able to look at how these areas were interacting &lt;em&gt;with context&lt;/em&gt;.  &lt;/p&gt;
+
+&lt;p&gt;For example: You can use SQL Profiler to see SQL is executing, but you do not know, what thread it is executing on, what logic business operation it belongs to, what system made that request (is it servicing a web, or backend process request), where it fits in the flow of the application.&lt;/p&gt;
+
+&lt;p&gt;Serilog gives you complete control over what information is important to you and your problem domain.  Things that traditionally are quite difficult to track, like how long threads are being blocked (and how often) are now possible.&lt;/p&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;Note: This blog post talks about Serilog, but for the most part any structured logging framework could be used here.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;h3 id="theproofofconcept"&gt;The proof of concept&lt;/h3&gt;
+
+&lt;p&gt;For my own purposes I created a proof of concept using the default ASP.Net template with some data access through &lt;a href="https://github.com/StackExchange/dapper-dot-net"&gt;Dapper&lt;/a&gt; and the &lt;a href="https://northwinddatabase.codeplex.com/"&gt;Northwind database&lt;/a&gt;.  I created my own dummy cache provider.  You can find the POC on GitHub &lt;a href="https://github.com/DevEnable/MetricalSerilog"&gt;here&lt;/a&gt;.  &lt;/p&gt;
+
+&lt;p&gt;I created some wrappers around the base database objects (e.g. DbCommandWrapper) so that I could capture how ADO.Net was interacting with the database.  I also created additional logic to say record how large an object being inserted in a distributed cache was.&lt;/p&gt;
+
+&lt;p&gt;Through the proof of concept I could correlate the entire flow of the application from a performance &amp;amp; scale perspective (for the facets I was interested in).&lt;/p&gt;
+
+&lt;h3 id="enterseq"&gt;Enter Seq&lt;/h3&gt;
+
+&lt;p&gt;&lt;a href="https://getseq.net/"&gt;Seq&lt;/a&gt; is effectively a supported datastore (or &lt;a href="https://github.com/serilog/serilog/wiki/Provided-Sinks"&gt;sink&lt;/a&gt;) that Serilog can write entry information into.  It is a commercial product that you can use for free as a single user.&lt;/p&gt;
+
+&lt;p&gt;What Seq does really well is let you visualize the data.  It has its own &lt;a href="https://getseq.atlassian.net/wiki/display/SEQ10/Querying+log+events"&gt;query syntax&lt;/a&gt; which really showcases the power that structured logging gives you over standard text-based logging.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://www.devenable.com/content/images/2015/02/Seq.png" alt=""&gt;&lt;/p&gt;
+
+&lt;h3 id="correlatingbusinessactivities"&gt;Correlating business activities&lt;/h3&gt;
+
+&lt;p&gt;Nicholas Blumhardt who is one of the people behind Serilog / Seq has an &lt;a href="http://nblumhardt.com/2015/01/designing-log-events-for-effective-correlation/"&gt;excellent blog post&lt;/a&gt; on this topic.  My proof of concept didn't include the business context but it should be quite easy to see how to do this.&lt;/p&gt;
+
+&lt;h2 id="datasensitivity"&gt;Data sensitivity&lt;/h2&gt;
+
+&lt;p&gt;Many organizations, including the one I am currently consulting for are very sensitive about data, particularly their customer's data.  One of the obvious benefits that using a structured logging approach for tracking performance &amp;amp; scale metrics over a profiler is that it can run in production.  But this doesn't mean it &lt;em&gt;has&lt;/em&gt; to.&lt;/p&gt;
+
+&lt;p&gt;For this particular client we have it on our roadmap to create a branch in source control that acts as a 'playground' to allow us to inject code and try things out.  This code will never hit production and changesets will never leave this branch.  But what we can do is put in all that logging around data that would be very sensitive in production in order to identify and deal with the technical challenges ahead.&lt;/p&gt;
+
+&lt;h2 id="extensibility"&gt;Extensibility&lt;/h2&gt;
+
+&lt;p&gt;Seq and Serilog both have extensibility points and it will be interesting to see what the community comes up with in the future.  I myself for the POC used the Serilog.Extras.Timings Nuget package but there are already a number of &lt;a href="https://github.com/serilog/serilog/wiki/Extras"&gt;extras&lt;/a&gt; available. &lt;/p&gt;
+
+&lt;h2 id="whatnext"&gt;What next?&lt;/h2&gt;
+
+&lt;p&gt;I love the combination of Serilog &amp;amp; Seq.  This proof of concept has really sold me on the power that they offer.  Being able to look at instrumentation data in the context of business events is &lt;em&gt;huge&lt;/em&gt;.  My one problem, though, is despite being able to filter the data you essentially only get one view of it at a time and there is still far too much noise.  &lt;/p&gt;
+
+&lt;p&gt;Often when faced with performance &amp;amp; scale problems the hardest part isn't identifying the problem or coming up with a solution, but selling what needs done to the business.  Propellerheads like myself can look at  data and get value from it, but those making the final decisions need to do so off information that is meaningful to them.  &lt;/p&gt;
+
+&lt;p&gt;What I'd really like to see is some sort of reporting or 'Business Intelligence' functionality start making its way into Seq.  Only then in my opinion will it be able to stand up to the likes of &lt;a href="http://www.splunk.com/"&gt;Splunk&lt;/a&gt;.  Serilog does have a Splunk sink, but for where I am working at the moment, Seq's definite advantage is that it is low ceremony.&lt;/p&gt;</content:encoded></item><item><title>F# - This is how we sell it</title><description>&lt;p class="introduction"&gt;Selling F# to stakeholders - how?&lt;/p&gt;
+
+&lt;p&gt;The F# development community is awesome when it comes to promoting itself at macro level with resources such as &lt;a href="http://fsharpforfunandprofit.com/"&gt;F# for fun and profit&lt;/a&gt;,  &lt;a href="http://www.fsharpworkshop.com/"&gt;F# Workshop&lt;/a&gt;, &lt;a href="http://fsharp.org/"&gt;The F# Software Foundation&lt;/a&gt;, and open source projects such as the &lt;a href="https://github.com/fsprojects/VisualFSharpPowerTools"&gt;Visual F# Power Tools&lt;/a&gt;.  I've also found&lt;/p&gt;</description><link>http://www.devenable.com/f-this-is-how-we-sell-it/</link><guid isPermaLink="false">3b3f292a-1140-4aab-bcbf-2b5d3806eb46</guid><category>F#</category><category>Career</category><dc:creator>Stephen Kennedy</dc:creator><pubDate>Thu, 09 Oct 2014 22:07:54 GMT</pubDate><content:encoded>&lt;p class="introduction"&gt;Selling F# to stakeholders - how?&lt;/p&gt;
+
+&lt;p&gt;The F# development community is awesome when it comes to promoting itself at macro level with resources such as &lt;a href="http://fsharpforfunandprofit.com/"&gt;F# for fun and profit&lt;/a&gt;,  &lt;a href="http://www.fsharpworkshop.com/"&gt;F# Workshop&lt;/a&gt;, &lt;a href="http://fsharp.org/"&gt;The F# Software Foundation&lt;/a&gt;, and open source projects such as the &lt;a href="https://github.com/fsprojects/VisualFSharpPowerTools"&gt;Visual F# Power Tools&lt;/a&gt;.  I've also found them very supportive on Twitter and when asking vendors to support the language.&lt;/p&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;This post though, this post, is about selling F# at micro level. Most of the &lt;em&gt;tips&lt;/em&gt; will use F# as an example, but obviously they can be applied to other areas.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;&lt;strong&gt;Note:&lt;/strong&gt; I may or may not have been listening to Katy Perry's song 'This Is How We Do' on repeat while writing this post.  Regardless, I ask, no, I insist that you listen to it too in order to set the correct &lt;em&gt;ambience&lt;/em&gt;.&lt;/p&gt;
+
+&lt;hr&gt;
+
+&lt;h1 id="whyshouldireadthis"&gt;Why should I read this?&lt;/h1&gt;
+
+&lt;p&gt;I've always been surprised at how poor many developers are when it comes to selling technology options to their colleagues or stakeholders.  Throughout my career I've either been marginally talented, or incredibly lucky (likely some denomination of both) when it comes to getting people onside with the technologies I want to use to solve a problem.&lt;/p&gt;
+
+&lt;p&gt;All of the &lt;em&gt;tips&lt;/em&gt; in this post can be applied to other technologies, but I'm going to give them a F# spin as I often find when talking to people or presenting if I even mention F# people ask questions about how to convince others to get behind the language.&lt;/p&gt;
+
+&lt;p&gt;I'm going to be talking as a consultant, because that is my day job.  Even so these tips are just as applicable elsewhere.  &lt;/p&gt;
+
+&lt;p&gt;&lt;em&gt;But what I really hope, is that if you are a former, current, or future client that you stop reading &lt;strong&gt;here&lt;/strong&gt;.&lt;/em&gt;&lt;/p&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;It is said that if you know your enemies and know yourself, you will not be imperiled in a hundred battles; if you do not know your enemies but do know yourself, you will win one and lose one; if you do not know your enemies nor yourself, you will be imperiled in every single battle. - &lt;em&gt;Sun Tzu&lt;/em&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;Clearly, the people you are trying to convince are not your &lt;em&gt;enemies&lt;/em&gt;, far from it.  However, this famous quote from Sun Tzu really sums up the embodiment of how to best convince people to your way of thought.  &lt;/p&gt;
+
+&lt;hr&gt;
+
+&lt;h1 id="understandthelayoftheland"&gt;Understand the lay of the land&lt;/h1&gt;
+
+&lt;p&gt;Even if you have been working in your current environment for a long period of time, you might not actually understand it.  This is an entire blog post in itself, but to summarize the key areas of what makes up an environment.&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;The key stakeholders.  Not everyone is equal in an organization, and often the people at the top are not the important ones to influence, but it is the people below them that they rely on to make their decisions.
+&lt;ul&gt;&lt;li&gt;Figure out their inclinations (e.g. technical, business, personality, pragmatism) and try to work within them as opposed to running up against them.&lt;/li&gt;&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;If the organization has any, consider the factions.  Be careful who you side with, and equally, be careful about always siding with the same faction continually.  I'm not saying never do this, but as in all things, understand the consequences.
+&lt;ul&gt;&lt;li&gt;AKA, politics&lt;/li&gt;&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;Look at / find out the history of the organization, most of the decisions of the present you will find embedded in the past.
+&lt;ul&gt;&lt;li&gt;In particular look for what the mistakes of the past have been.  For example, something introduced that the organization considers a mistake, or situations where someone tried and failed to invoke change.&lt;/li&gt;&lt;/ul&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;img src="http://www.devenable.com/content/images/2014/10/Fotolia_59777817_XS-1.jpg" alt=""&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;&lt;em&gt;F# -&lt;/em&gt;&lt;/strong&gt; &lt;em&gt;For many organizations picking up a new language is something that they would consider huge risk.  You need to look at the people more willing to adopt something new and win them over.  By all means, talk about the technical upsides of F#, but unlike many technology choices there is no tangible benefit to business stakeholders so you need to focus on the other benefits in regards to reduced bugs and productivity gains.&lt;/em&gt;&lt;/p&gt;
+
+&lt;h1 id="topdownorbottomup"&gt;Top-down or bottom-up?&lt;/h1&gt;
+
+&lt;p&gt;You're probably familiar with this in terms of design, but I'm talking about how you approach the organization in regards to the initiative(s) you are trying to propose.  Generally one angle is more likely to reap more success than the other, and often you should attack both at once.&lt;/p&gt;
+
+&lt;p&gt;When talking to management consider what the key benefits that will interest them, as well as the potential drawbacks. Business stakeholders tend to be more interested in tangible benefits and typically have concerns around on-going costs, licensing, architectural / infrastructural impacts, risk, how it can be phased in, and impact on customers.&lt;/p&gt;
+
+&lt;p&gt;While developers obviously care about tangible benefits, they tend to be more focused on the non-tangible benefits than business stakeholders.  Their concerns revolve around different issues.  How quickly are they going to pick this up?  Will this make their jobs easier or more difficult?  Is it something they are going to enjoy working with, or is it going to be a PITA?&lt;/p&gt;
+
+&lt;p&gt;Things will move more quickly with management being the key driver, however, there is something to be said about a groundswell movement behind an initative.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;&lt;em&gt;F# -&lt;/em&gt;&lt;/strong&gt; &lt;em&gt;You're probably going to have more luck approaching things from bottom down.  Certainly, there are important benefits to F# that impact directly on the business, particularly around productivity, scalability, and maintainability.  But those benefits are going to reasonate far more with a developer.&lt;/em&gt;&lt;/p&gt;
+
+&lt;h1 id="howimetyourmother"&gt;How I met your mother&lt;/h1&gt;
+
+&lt;p&gt;How you were brought into the organization has a huge impact on how quickly you are going to be able to invoke change.  If we're talking about a vehicle, we're talking about your acceleration.&lt;/p&gt;
+
+&lt;p&gt;If you were brought in as a subject matter expert as opposed to a general development resource this will give you more credibility initially.&lt;/p&gt;
+
+&lt;p&gt;If you were head-hunted, or asked to help the organization (as opposed to just applying to a job advertisement) then this will give you a lot more impetus for change.&lt;/p&gt;
+
+&lt;h1 id="beobjective"&gt;Be objective&lt;/h1&gt;
+
+&lt;p&gt;Credibility is the currency of invoking change.  &lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://www.devenable.com/content/images/2014/10/Fotolia_70548114_XS.jpg" alt=""&gt;&lt;/p&gt;
+
+&lt;p&gt;You are surrounded by intellectuals.  Intellectuals rarely take things at face value and often double check information that they are presented with.  &lt;/p&gt;
+
+&lt;p&gt;Don't skirt around issues, and certainly don't hide anything.  Present legitimate alternate options.  The more up front you are about alternatives and drawbacks to the approach you are suggesting the more it boosts your credibility, and people are willing to have belief that this is in fact the best option.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;&lt;em&gt;F# -&lt;/em&gt;&lt;/strong&gt; &lt;em&gt;By all means talk up how &lt;a href="https://www.devenable.com/f-youve-left-me-a-broken-man/"&gt;awesome F# is&lt;/a&gt; when compared to the other .Net languages.  But at least mention other functional languages or paradigms.  For example, could Reactive Extensions do a sufficent job?  And talk about F# and its poor tooling.  Give credible examples on where F# excels, and when it doesn't do as well as contemporary C#.&lt;/em&gt;&lt;/p&gt;
+
+&lt;h1 id="earnthatcredibility"&gt;Earn that credibility&lt;/h1&gt;
+
+&lt;p&gt;Most of the credibility you are going to earn is not through what you say, but what you do.  You'll gain credibility for doing things that may be completely outside of what you are trying to achieve.&lt;/p&gt;
+
+&lt;p&gt;Earn that credibility, store it up, and then use it to drive the change  you are looking for.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;&lt;em&gt;F# -&lt;/em&gt;&lt;/strong&gt; &lt;em&gt;When working on more mundane tasks, consider using and then promoting the functional programming that is available to you in C#.  It could be through using a functional programming style, showcasing the power of immutability, elegantly using LINQ / lambda expressions, or tapping into some Reactive Extensions.  Not only will you record some wins, but the way in which you do it will be noticed.&lt;/em&gt;&lt;/p&gt;
+
+&lt;h1 id="itsbettertoaskforgivenessthanpermission"&gt;It's better to ask forgiveness than permission&lt;/h1&gt;
+
+&lt;p&gt;&lt;img src="http://www.devenable.com/content/images/2014/10/Fotolia_54925428_XS.jpg" alt=""&gt;&lt;/p&gt;
+
+&lt;p&gt;WRONG!&lt;/p&gt;
+
+&lt;h1 id="youmightbewrong"&gt;You might be wrong&lt;/h1&gt;
+
+&lt;p&gt;Not everyone sees from your perspective.  And you rarely have the full picture.  Technology and methodology choices often have pro's and con's and you may not be weighing them up objectively (we're all human, I'm just as guilty of that as anyone) and as I need to re-iterate again, you probably don't have the full picture.&lt;/p&gt;
+
+&lt;p&gt;Just because it is the right technology choice, does not make it the right choice.&lt;/p&gt;
+
+&lt;h1 id="youreaskingpeopletotakearisk"&gt;You're asking people to take a risk&lt;/h1&gt;
+
+&lt;p&gt;Chances are depending on whatever decision is being made it isn't going to be you footing the bill, left with the screaming baby, or bearing the long term scars.  (Yes even if you are a &lt;em&gt;permanent&lt;/em&gt; employee)  &lt;/p&gt;
+
+&lt;p&gt;One of the best ways you can encourage people to take that risk, is to take that risk with them.  There have been many occasions where I have invested my own personal time in a technology working on a proof of concept before presenting it to the business because I considered it worth the risk.  Not only does it show you are committed, but it also gives the business something tangible they can look at.&lt;/p&gt;
+
+&lt;p&gt;And you know what works better than doing the work yourself?  Leveraging a colleagues efforts.  Thanks &lt;a href="https://github.com/daniel-chambers/FSharp.Azure"&gt;Daniel Chambers!&lt;/a&gt; :)&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;&lt;em&gt;F# -&lt;/em&gt;&lt;/strong&gt; &lt;em&gt;If you're into F# chances are your first forays with it have been on personal projects.  Talk about them with colleagues and even better, show them!  If you are working on something that you think would be much better in F#, write a port and prove it!&lt;/em&gt;&lt;/p&gt;
+
+&lt;h1 id="playyourcardstoyourchest"&gt;Play your cards to your chest&lt;/h1&gt;
+
+&lt;p&gt;Occasionally I will propose things that I have no intention of fighting for.  Some people (see the lay of the land) just want to make their presence felt.  Give them their wins.  &lt;/p&gt;
+
+&lt;p&gt;Likewise, be objective as to whats important.  Sometimes you may want a particular piece to be included in the scope of change.  Think really hard about if it is worth potentially sacrificing the larger scope of change that you are fighting for.  Be prepared to give up some of the smaller pieces for the greater good.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://www.devenable.com/content/images/2014/10/Fotolia_63370624_XS.jpg" alt=""&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;&lt;em&gt;F# -&lt;/em&gt;&lt;/strong&gt; &lt;em&gt;The biggest battle is to get people to use F#.  Don't sacrifice it by fighting over frameworks.  Advise and let people draw their own conclusions.  You want everyone to feel like it is a joint team effort, not you leading the charge.&lt;/em&gt;&lt;/p&gt;
+
+&lt;h1 id="thereisnoconvincingeveryone"&gt;There is no convincing everyone&lt;/h1&gt;
+
+&lt;p&gt;Sometimes in this world you meet people so stubborn there is no convincing them.  Even with Columbus sailing around the world, and our advances in space technology there are likely still people out there in the modern world who believe that the world is flat.&lt;/p&gt;
+
+&lt;h1 id="itsawarnotabattle"&gt;It's a war, not a battle&lt;/h1&gt;
+
+&lt;p&gt;AKA the conclusion.&lt;/p&gt;
+
+&lt;p&gt;One of the common mistakes I see is developers getting frustrated when their initial sally didn't meet the success they were anticipating.  Convincing people to make the &lt;em&gt;right&lt;/em&gt; decision is often like hunting.  It involves a lot of observing, waiting, and then quick action at the right moments.&lt;/p&gt;
+
+&lt;p&gt;Be patient, and never get upset.&lt;/p&gt;
+
+&lt;p&gt;When I first come into a new organization I just sit and watch - often for weeks.  I do my work using their processes and their way of doing things.  I keep notes and keep track of what is going on.  I may make the occasional small suggestion (unless something is being particularly painful) but I keep the bulk of my thoughts to myself.  I look at where improvements can be made, but more importantly I also consider how and &lt;em&gt;when&lt;/em&gt; to try and introduce them.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;&lt;em&gt;F# -&lt;/em&gt;&lt;/strong&gt; &lt;em&gt;You can look at phasing it in slowly.  Scott Wlaschin has a &lt;a href="http://fsharpforfunandprofit.com/posts/low-risk-ways-to-use-fsharp-at-work/"&gt;fantastic article&lt;/a&gt; with great tips on how you can start introducing F# into your work without impacting production code.&lt;/em&gt;&lt;/p&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;For to win one hundred victories in one hundred battles is not the acme of skill. To subdue the enemy without fighting is the acme of skill. - &lt;em&gt;Sun Tzu&lt;/em&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;But the golden rule is this - What would Katy do?&lt;/p&gt;</content:encoded></item><item><title>Xamarin Maps and Location</title><description>&lt;p class="intro"&gt;The conclusion to my blog series on Xamarin Maps and Location.&lt;/p&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;This was originally meant to be a longer in more detail blog series.  But time and other priorities have gotten in the way.  &lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;... I do actually have a working solution across the 3 platforms though on GitHub.&lt;/p&gt;
+
+&lt;h2 id="thesolution"&gt;The solution&lt;/h2&gt;</description><link>http://www.devenable.com/xamarin-maps-and-location/</link><guid isPermaLink="false">b230c6bf-6742-4bee-b945-a62295bea7dd</guid><category>Xamarin</category><dc:creator>Stephen Kennedy</dc:creator><pubDate>Mon, 29 Sep 2014 22:55:01 GMT</pubDate><content:encoded>&lt;p class="intro"&gt;The conclusion to my blog series on Xamarin Maps and Location.&lt;/p&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;This was originally meant to be a longer in more detail blog series.  But time and other priorities have gotten in the way.  &lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;... I do actually have a working solution across the 3 platforms though on GitHub.&lt;/p&gt;
+
+&lt;h2 id="thesolution"&gt;The solution&lt;/h2&gt;
+
+&lt;p&gt;&lt;a href="https://github.com/DevEnable/DataVic"&gt;https://github.com/DevEnable/DataVic&lt;/a&gt;&lt;/p&gt;
+
+&lt;hr&gt;
+
+&lt;h2 id="quickstart"&gt;Quickstart&lt;/h2&gt;
+
+&lt;p&gt;You shouldn't need to do much in order to get the solution working.  There are a few things you will need to do though.&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;There are a few API keys you will need to supply.
+&lt;ul&gt;&lt;li&gt;In the &lt;a href="https://www.devenable.com/proof-of-concept-common-mobile-services-client-pcl/"&gt;DataClient&lt;/a&gt; - your Azure Mobile Services key once you've hosted it.&lt;/li&gt;
+&lt;li&gt;Inside the GeoLocator - a &lt;a href="https://www.devenable.com/finding-locations-with-bing-maps-on-a-server/"&gt;Bing maps API key&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;Inside AndroidManifest.xml - your Google play API key&lt;/li&gt;&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;You will need to host your Azure Mobile Service
+&lt;ul&gt;&lt;li&gt;Ensure that you run the &lt;a href="https://www.devenable.com/azure-mobile-services-scheduled-jobs/"&gt;scheduled job&lt;/a&gt; at least once.&lt;/li&gt;&lt;/ul&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;From there it should be pretty cut and dry in terms of what you need to do.&lt;/p&gt;
+
+&lt;hr&gt;
+
+&lt;h2 id="clientoverviewandfeatures"&gt;Client overview and features&lt;/h2&gt;
+
+&lt;p&gt;In terms of the functionality the clients will communicate with the Azure Mobile Services for all of their data.  The data is centered around Melbourne, Victoria, Australia and you will need to use each devices relevant location mocking features in order to find internet locations on the client.&lt;/p&gt;
+
+&lt;p&gt;The iPhone and Android versions are slightly more fully featured than the Windows Phone version.  (I'd claim keeping with industry standard, but it was more sheer laziness on my part)&lt;/p&gt;
+
+&lt;p&gt;In general though when moving through locations the client will search for internet hotspots.  If they have WiFi it will show an estimated radius of signal as an overlay, but if they are wired only then they will appear as a marker (or pushpin, or whatever the device calls it).&lt;/p&gt;
+
+&lt;p&gt;Below is an example screenshot taken from the iOS simulator.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://www.devenable.com/content/images/2014/Sep/iOS_DataVic.png" alt=""&gt;&lt;/p&gt;
+
+&lt;hr&gt;
+
+&lt;h2 id="mockinglocationemulators"&gt;Mocking location &amp;amp; emulators&lt;/h2&gt;
+
+&lt;p&gt;I just wanted to make one special mention regarding mocking location.  &lt;/p&gt;
+
+&lt;p&gt;Windows Phone has a brilliant emulator that makes doing this sort of stuff so simple.  And the iPhone simulator, while not as good at least lets you do the job as you can just plug in a latitude and longitude.&lt;/p&gt;
+
+&lt;p&gt;The Android emulators are rotten.  For a platform that touts extensibility, by far the hardest and most time consuming piece was trying to get these emulators to work, especially a version with Google Play installed.  I probably burnt a good 6 or 7 hours on this infuriating task and still failed.  Do yourself a favour, look at using &lt;a href="http://www.genymotion.com/"&gt;Genymotion&lt;/a&gt; or something similar.  &lt;/p&gt;
+
+&lt;p&gt;Also the Android SDK emulators only give you two options to mock location.  Telnet (seriously?) or by putting code inside the Android client to tell it what locations to mock.  Again, Genymotion offers a better solution as it gives you a UI to mock location with.  &lt;/p&gt;
+
+&lt;hr&gt;
+
+&lt;h2 id="lookingformorehelp"&gt;Looking for more help&lt;/h2&gt;
+
+&lt;p&gt;Everything I did was as a result of looking at blog posts or using the examples Xamarin provide.  Feel free to drop a line if you are having any issues with my sample and I will point you in the right direction.&lt;/p&gt;</content:encoded></item><item><title>F# you've left me a broken man</title><description>&lt;p&gt;There was a &lt;a href="https://twitter.com/Functional_S/status/511811778809188352"&gt;really great Tweet&lt;/a&gt; going around the F# community the other day that really resonated with me.  The chart was simple but illustrative of the destitution a developer faces when they are forced to move on from F#.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://www.devenable.com/content/images/2014/Sep/FSharpValue.jpg" alt=""&gt;&lt;/p&gt;
+
+&lt;p&gt;A short while ago I was fortunate enough to work&lt;/p&gt;</description><link>http://www.devenable.com/f-youve-left-me-a-broken-man/</link><guid isPermaLink="false">1a253bbd-9ea4-496c-914c-8443f73e3161</guid><category>F#</category><dc:creator>Stephen Kennedy</dc:creator><pubDate>Thu, 25 Sep 2014 12:00:41 GMT</pubDate><content:encoded>&lt;p&gt;There was a &lt;a href="https://twitter.com/Functional_S/status/511811778809188352"&gt;really great Tweet&lt;/a&gt; going around the F# community the other day that really resonated with me.  The chart was simple but illustrative of the destitution a developer faces when they are forced to move on from F#.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://www.devenable.com/content/images/2014/Sep/FSharpValue.jpg" alt=""&gt;&lt;/p&gt;
+
+&lt;p&gt;A short while ago I was fortunate enough to work on a project for three months using F#.  I enjoyed F#, after a while I started to &lt;em&gt;get it&lt;/em&gt;.  Unfortunately, about the time that F# and the hybrid functional programming style really started to sink in the engagement ended.  All that being said I was really happy with what I produced.&lt;/p&gt;
+
+&lt;p&gt;More recently, I've been working at an engagement using VB.Net. Now, I prefer coding in C# to VB.Net, but given that I started out my development career using VB.Net the language doesn't bother as much as it does many developers.  Regardless, VB.Net vs C# so isn't the point of this post.  &lt;/p&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;I don't want people to get fixated on VB.Net so I'm just going to pretend for the rest of this post that I'm actually using C#.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;What I'm finding irritating is that I want to use my F# patterns as I find them so much more descriptive than what you can do with C#.&lt;/p&gt;
+
+&lt;h2 id="itsthelittlethings"&gt;It's the &lt;em&gt;little&lt;/em&gt; things.&lt;/h2&gt;
+
+&lt;p&gt;I under appreciated &lt;strong&gt;immutability&lt;/strong&gt;.  If you'll forgive the arrogance, I saw its main purpose in dealing with developers who didn't understand how to manage state across a concurrent system.  (And a 'few' other legitimate cases around concurrent processing and event sourcing).  But having immutable objects made my code far more deterministic and easier to follow.  I produced less bugs and my tests instead of usually failing after being written almost always went green.  &lt;/p&gt;
+
+&lt;p&gt;I just want to &lt;strong&gt;pipe&lt;/strong&gt; everything.  I went from finding piping this weird hippy construct to wanting to build up my logic production line.  Piping makes the flow of logic really simple to follow.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Discriminated Unions&lt;/strong&gt; are awesome.  If this is a breakup then they are the puppy dog of the relationship.  They are the one thing that I knew I was going to miss.  Being able to lay out a simple series of choices along with correlated data made it so easy to have a descriptive composible programming structure.&lt;/p&gt;
+
+&lt;p&gt;The switch statement is not replacement for F#'s &lt;strong&gt;match&lt;/strong&gt;.  If you don't know what I'm talking about &lt;a href="http://fsharpforfunandprofit.com/posts/conciseness-pattern-matching/"&gt;check-it'&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;There are plenty of other things I miss like no nulls, parallelism, code quotations, type providers, and computational expressions but it gets pretty sad after a while seeing a grown man cry.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://www.devenable.com/content/images/2014/Sep/Crying_Box.jpg" alt=""&gt;&lt;/p&gt;
+
+&lt;h2 id="fhaschangedthewayicodewithc"&gt;F# has changed the way I code with C#.&lt;/h2&gt;
+
+&lt;p&gt;When coding up my first &lt;em&gt;C#&lt;/em&gt; task since moving on from F# I just figured I'd go back to my roots.  But I had to keep catching myself when doing that things I wouldn't have ordinarily done before.  And you know what?  It's actually &lt;em&gt;improved&lt;/em&gt; my programming style.&lt;/p&gt;
+
+&lt;p&gt;I think a lot more about whether or not an object needs to be mutable.  I'm continuing with my production line, but since C# doesn't support piping I'm having to rein it in a bit.&lt;/p&gt;
+
+&lt;p&gt;I picked up a task the other day that seemed fine to do in C# but I kept finding things like wanting to pull in data from different sources and map it all in parallel, and then finish it up aggregating the resulting mappings.  You know, map / reduce!  F# again is so well suited for that.  And I keep finding examples of that in my work.&lt;/p&gt;
+
+&lt;h2 id="butallireallywanttosayis"&gt;But all I really want to say is...&lt;/h2&gt;
+
+&lt;p&gt;F# - I'm sorry, I miss you, please take me back.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Authors Note:&lt;/strong&gt;  I'm not saying F# all of the things as that wouldn't be objective.  C# is still a very good programming language, and the F# tooling really needs to catch up.    &lt;/p&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;Actually - fuck it, F# all of the things!!!&lt;/p&gt;
+&lt;/blockquote&gt;</content:encoded></item><item><title>Express Yourself in Your Career</title><description>&lt;p class="intro"&gt;Recently I've been doing a fair bit of, 'what if' thinking around my career choices from when I first started, and how the landscape looks today.&lt;/p&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;&lt;strong&gt;Note:&lt;/strong&gt; I originally posted this article on &lt;a href="https://www.msgooroo.com/"&gt;MS Gooroo&lt;/a&gt; in their win a Surface Pro 3 competition.  My article was one of the winners!&lt;/p&gt;&lt;/blockquote&gt;</description><link>http://www.devenable.com/express-yourself-in-your-career/</link><guid isPermaLink="false">643e84e8-6cf8-4f34-b774-9333a4017046</guid><category>Career</category><dc:creator>Stephen Kennedy</dc:creator><pubDate>Mon, 08 Sep 2014 06:57:34 GMT</pubDate><content:encoded>&lt;p class="intro"&gt;Recently I've been doing a fair bit of, 'what if' thinking around my career choices from when I first started, and how the landscape looks today.&lt;/p&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;&lt;strong&gt;Note:&lt;/strong&gt; I originally posted this article on &lt;a href="https://www.msgooroo.com/"&gt;MS Gooroo&lt;/a&gt; in their win a Surface Pro 3 competition.  My article was one of the winners!  The original can be found &lt;a href="https://www.msgooroo.com/GoorooTHINK/Article/16195/Express-yourself-in-your-career/13989#.VA1Oe_mSy2c"&gt;here&lt;/a&gt;.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;h2 id="abitofbackground"&gt;A bit of background&lt;/h2&gt;
+
+&lt;p&gt;During university I dabbled in a few languages in order to complete the course work - C, VB6, Java, and a little bit of Haskell. But, I certainly was never very proficient in any of these languages. When I moved into the job market there were very few junior development jobs (due to the after effects of the dot-com bubble bursting, NASDAQ crash, etc). I had many university colleagues that for a time gave up on IT and I ended up on an ISP hell-desk.&lt;/p&gt;
+
+&lt;p&gt;After a long, fraught, and painful 18 months I finally managed to pick up a development job overseas in Sydney (I’m a kiwi) through a friend developing in VB.Net at a start-up. I spent 3 ½ years working on a really cool product often getting quite deep into the .Net framework in order to do things which at the time had very little in the way of documentation or knowledge. I felt like a cowboy and I loved it.&lt;/p&gt;
+
+&lt;p&gt;VB.Net was comfortable, but I wasn’t in love. Thankfully, breakups with computer languages are generally less emotional draining than breakups with romantic partners and after working at the start-up I moved on to C#. It felt closer to what I wanted, but while I like it, I’ve never really developed ‘nerd chills’ while using the language.  &lt;/p&gt;
+
+&lt;hr&gt;
+
+&lt;h2 id="whereiamatnow"&gt;Where I am at now&lt;/h2&gt;
+
+&lt;p&gt;Over the last 6 or so months I’ve been teaching myself Xamarin (cross platform development for iOS, OS X, and Android using .Net) in my own time. Additionally, for the last couple of months I’ve been using &lt;a href="http://www.tryfsharp.org/"&gt;F#&lt;/a&gt; at work.&lt;/p&gt;
+
+&lt;p&gt;After over ten years in the IT industry I’ve finally found a language I actually love. Coupled with this, my playing with &lt;a href="http://xamarin.com/"&gt;Xamarin&lt;/a&gt; has left me exposed to completely different tool chains, design philosophies, and a different pool of the development community that I never really acknowledged or interacted with.&lt;/p&gt;
+
+&lt;p&gt;Clearly, the progression from VB.Net to C#, to F# is not particularly startling. But the shift from OO to functional, along with working with toolsets from different vendors has left me wondering, what have I missed out on?  &lt;/p&gt;
+
+&lt;hr&gt;
+
+&lt;h2 id="missedsignposts"&gt;Missed signposts&lt;/h2&gt;
+
+&lt;p&gt;&lt;img src="http://www.devenable.com/content/images/2014/Sep/Fotolia_51071376_XS.jpg" alt=""&gt;&lt;/p&gt;
+
+&lt;p&gt;I think there have been a number of points in my career where realistically speaking I should have come up for breath and taken a look at the landscape.&lt;/p&gt;
+
+&lt;p&gt;The point where I moved on from VB.Net, when iPhones became a thing, when making technology choices for my own start-up, and plenty more.&lt;/p&gt;
+
+&lt;p&gt;When smart phones really hit the consumer market, I told myself that I didn’t want to learn Java or Objective C because with no real prior knowledge I felt that they were sub-par to C#. They were ‘yuck’ and I didn’t want to dirty myself by learning them. I was also worried about hurting future career prospects as I might no longer be perceived as a specialist.&lt;/p&gt;
+
+&lt;p&gt;I really wonder if I shot myself in the foot when I took this view. After dabbling in Xamarin I didn’t find Java that bad, and while I still struggle to even comprehend Objective C the tooling Apple provides around iOS isn’t all that bad.  &lt;/p&gt;
+
+&lt;hr&gt;
+
+&lt;h2 id="whatif"&gt;What if?&lt;/h2&gt;
+
+&lt;p&gt;Think back to your own career. Have there been moments when you could have shifted sails and potentially be in a completely different position to where you are now?&lt;/p&gt;
+
+&lt;p&gt;What if I’d taken the plunge and learnt iOS / Android development when the hype began? Would I now be using a café as my office while looking at download reports from the Apple Store?&lt;/p&gt;
+
+&lt;p&gt;What if I’d ignored the dire warnings of brutal hours for little reward and become a game developer? Would I now be trying to get my game up on Steam Greenlight, or starting a Kickstarter campaign for my own take on Space Invaders?&lt;/p&gt;
+
+&lt;p&gt;What if I’d become a JavaScript guru, would I also have my very own JavaScript framework that you can download from my GitHub repository? No, probably (hopefully) not. What would happen if I decided to take my career in a completely different direction now?  &lt;/p&gt;
+
+&lt;hr&gt;
+
+&lt;h2 id="expressingourselves"&gt;Expressing Ourselves&lt;/h2&gt;
+
+&lt;p&gt;As developers there are two ways that we can express ourselves.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;In code&lt;/strong&gt; - the way we describe our logic, the design, and architecture that we use in order to solve a problem. The beauty in the way that we craft our code such that another developer can understand and appreciate what we have done.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;In the end product&lt;/strong&gt; – simply put, it is all about feeling the love. Can I as an end user feel that the product you are shipping is loved, and is crafted with care? Obviously in larger organizations there are constraints around what the product owner wants, or the UX team (if there is one) decides. But I pretty much guarantee you, that for each product that you look at, or use, you can get an appreciation for how much love and care was put into it. It may just be a spreadsheet application, but are there any nice little touches that were put in place to make my life easier as I document and compile the latest 921, 552 survey results from the Justin Bieber fan club.&lt;/p&gt;
+
+&lt;hr&gt;
+
+&lt;h2 id="howisexpressionrelevanttoyourcareer"&gt;How is expression relevant to your career?&lt;/h2&gt;
+
+&lt;p&gt;The capacity of being able to express yourself is something that I have only recently really started to really appreciate. Its importance seems kind of obvious, but at the same time it gets sacrificed far too easily.&lt;/p&gt;
+
+&lt;p&gt;The ability for someone to express one’s self has a direct impact on your motivation, drive, and pride in what you do. And these three factors have a direct impact on your career.&lt;/p&gt;
+
+&lt;p&gt;All too often I see developers that could be brilliant, but due to poor choices and low confidence they have managed to dig themselves into a hole.&lt;/p&gt;
+
+&lt;p&gt;I guarantee you that almost every developer got into this business because they wanted to create, or be part of something cool. I doubt your accountant can say that.  &lt;/p&gt;
+
+&lt;hr&gt;
+
+&lt;h2 id="takinginspirationfromelsewhere"&gt;Taking inspiration from elsewhere&lt;/h2&gt;
+
+&lt;p&gt;&lt;img src="http://www.devenable.com/content/images/2014/Sep/Fotolia_61641556_XS.jpg" alt=""&gt;&lt;/p&gt;
+
+&lt;p&gt;Artists and designers do this all of the time. It is something I have started to do as well. There are so many great minds in our industry and I actually find it interesting to look at something, see (or guess if I don’t have access to the code) how it was done, possibly take that idea, and move it into another direction.&lt;/p&gt;
+
+&lt;p&gt;For example, at work for a client we needed to write a highly customized object mapping component (like AutoMapper, but different). I’d played with ReactiveUI in the past and I wanted to see if I could create a similar API to what it uses when binding objects. I took looked at how the ReactiveUI contributors had implemented binding and wrote it using F# in a manner that made sense to the component I was writing. I was super happy with the end result, a mapper with highly customized logic, but so declarative in nature that it would be easy for someone like a BA to look at the code and understand what was going on.  &lt;/p&gt;
+
+&lt;hr&gt;
+
+&lt;h2 id="stopbeingsobloodynarrowminded"&gt;Stop being so bloody narrow minded&lt;/h2&gt;
+
+&lt;p&gt;I think that most of us are guilty of this in one way or another. We get caught up in our favourite language, platform, tool, or product that sometimes we can’t see the big picture. There is often value in learning something, not because you necessarily adopt it, but because you learn something new that you can take elsewhere.&lt;/p&gt;
+
+&lt;p&gt;Notable members of the community such as Martin Fowler actually &lt;a href="http://martinfowler.com/bliki/OneLanguage.html"&gt;recommend that developers learn one language a year&lt;/a&gt;.&lt;/p&gt;
+
+&lt;hr&gt;
+
+&lt;h2 id="thereisnoiinteam"&gt;There is no I in team&lt;/h2&gt;
+
+&lt;p&gt;Most of us work in teams, and it is important that the developers, and the software they are writing is on the same plan. A parallel I would draw is with the props team in a movie. They need to fulfil a set of requirements, and there generally multiple creative expressive individuals on the team, but their end goal is to provide one cohesive, and hopefully awesome set of props to support the movie.  &lt;/p&gt;
+
+&lt;hr&gt;
+
+&lt;h2 id="languageandexpression"&gt;Language and expression&lt;/h2&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;I’m going to preface this by declaring that I am not a language guy. If you go all computer science on me in a conversation and start talking compilers, computational theory, or mathematics I am likely to merely nod and grunt in your general direction until the conversation goes elsewhere. (Hopefully, the glaze over my eyes isn’t too obvious, I wouldn’t want to be rude)&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;&lt;img src="http://www.devenable.com/content/images/2014/Sep/Fotolia_62900673_XS.jpg" alt=""&gt;&lt;/p&gt;
+
+&lt;p&gt;I’m going to close up by talking about language. But a lot of these general concepts can also apply to tools and platform which are equally, if not more relevant in terms of how we express ourselves.&lt;/p&gt;
+
+&lt;p&gt;Language is very important to a developer it is how they that take that mental picture of how they are going to construct something and convert it into a form that later can be turned into machine code. It is the description of their thought processes, and through it, it articulates not just to the machine but to other developers how the logic should flow.&lt;/p&gt;
+
+&lt;p&gt;Understandably, developers get very passionate about language. There is great division across the development community in terms of what language is the best, and at the same time, each language has its own strengths and weaknesses.&lt;/p&gt;
+
+&lt;p&gt;I am a big believer that we are the sum of our experiences. If I hadn’t started out as a .Net developer, if I had a broader appreciation of different programming languages, if I started my career only two years ago - would I still be a .Net developer? I honestly don’t know if I would be.  &lt;/p&gt;
+
+&lt;hr&gt;
+
+&lt;h2 id="dontbeblindtotherealproblems"&gt;Don't be blind to the real problems&lt;/h2&gt;
+
+&lt;p&gt;I said I wanted to close off with language, but I lied. One final caveat in all of this is I often hear people complain that if we had used language X or tool Y that we wouldn’t be in this position.&lt;/p&gt;
+
+&lt;p&gt;More often than not that is a fallacy. You are more likely to be in in that position because of some combination of not architecting and designing your application correctly, allowing technical debt to get out of control, or some breakdown in the software development process and methodologies being used.  &lt;/p&gt;
+
+&lt;hr&gt;
+
+&lt;h2 id="conclusion"&gt;Conclusion&lt;/h2&gt;
+
+&lt;p&gt;The languages and tools that you use are just the physical constructs supporting the thought processes of you and your fellow team members. Some tools and languages better articulate what you are trying to achieve and everyone is different.&lt;/p&gt;
+
+&lt;p&gt;So stand up for a moment, take a look around, and make sure that this is still where you really want to be.&lt;/p&gt;</content:encoded></item><item><title>Reflections on Presenting at DDD Melbourne</title><description>&lt;p&gt;On Saturday, I presented at &lt;a href="http://www.dddmelbourne.com/"&gt;DDD Melbourne&lt;/a&gt; with a topic entitled 'Why All of the Cool Kids Are Talking Xamarin', and well things didn't quite go to plan, not train wreck bad, but certainly not as well as I would have hoped.  But, before I get started, I just want&lt;/p&gt;</description><link>http://www.devenable.com/reflections-on-presenting-at-ddd-melbourne/</link><guid isPermaLink="false">c2a8abf5-5e23-4ccc-8f48-616062bf6b3f</guid><category>Presenting</category><dc:creator>Stephen Kennedy</dc:creator><pubDate>Sun, 20 Jul 2014 06:04:15 GMT</pubDate><content:encoded>&lt;p&gt;On Saturday, I presented at &lt;a href="http://www.dddmelbourne.com/"&gt;DDD Melbourne&lt;/a&gt; with a topic entitled 'Why All of the Cool Kids Are Talking Xamarin', and well things didn't quite go to plan, not train wreck bad, but certainly not as well as I would have hoped.  But, before I get started, I just want to state one thing - this is not an apology, I'm blogging about this as a point of reference for future improvements to the way I present and to possibly give tips to someone else who may be presenting in the future.&lt;/p&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;Slides can be found here - &lt;a href="https://speakerdeck.com/devenable/why-all-of-the-cool-kids-are-talking-xamarin"&gt;https://speakerdeck.com/devenable/why-all-of-the-cool-kids-are-talking-xamarin&lt;/a&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;Previous to DDD Melbourne I'd never even presented at a user group meeting let alone at a local event.  I'd done a lot of presentations but these were to either client organizations or the organizations I was working for.  Various people (none of them my mother I should add) had told me that I was very good at presenting and I was feeling pretty confident.  I'd put a tonne of effort into my presentation and was feeling good about it.&lt;/p&gt;
+
+&lt;p&gt;Here is what went wrong:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;I forgot that I had recently installed the Windows Store Twitter app and left notifications on in the background - &lt;strong&gt;SPAM&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;I didn't ensure that I had network connectivity before I started my talk, and after plugging in the network cable (in the middle of the presentation) I didn't have time to check that I had connectivity to Azure on my Android emulation image that was running.&lt;/li&gt;
+&lt;li&gt;I let the above and a number of other smaller factors get to me when they really shouldn't have.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h1 id="whatilearnedfromtheexperience"&gt;What I learned from the experience&lt;/h1&gt;
+
+&lt;h3 id="dontstartyourpresentationuntilyouareintherightstateofmind"&gt;Don't start your presentation until you are in the right state of mind&lt;/h3&gt;
+
+&lt;p&gt;The previous speaker went over time, particularly with people asking him questions, and I certainly bare him no animosity, he was apologetic and gracious.  On top of that the event wanted to record my session which involved installing Camtasia that they had on a USB key so I didn't do a proper tech-check, like ensuring I'd plugged my laptop into the network.&lt;/p&gt;
+
+&lt;p&gt;I knew my presentation was already likely to run over time so I just launched straight into it despite the fact I wasn't feeling particularly 'in the zone'.&lt;/p&gt;
+
+&lt;p&gt;What I should have done is taken a moment to re-centre myself, perhaps briefly chatting with a few people before launching into it.  It is better to have a slightly presentation glossing over a few things, than delivering something with a lack of clarity.&lt;/p&gt;
+
+&lt;h3 id="ifyouarebadatrememberingthingsdontbeafraidtohavealotofslides"&gt;If you are bad at remembering things don't be afraid to have alot of slides&lt;/h3&gt;
+
+&lt;p&gt;I have the memory of a goldfish, it is really terrible.  I can't even remember the names of variables, properties, or classes most of the time unless they are on the screen when I am coding.  &lt;/p&gt;
+
+&lt;p&gt;Previously, for all my other talks I'd compensate for this by having a lot of slides that I could almost literally read.  With say a single line bullet point covering a paragraph or so worth of content.  The trick with this is to have a lot of slides with interesting content such as pictures breaking them up to keep people engaged.  I am not saying that you should use slides with walls of text, or just a huge litany of bullet points throughout your presentation.&lt;/p&gt;
+
+&lt;p&gt;I don't know why, but for this talk I decided that I didn't want a lot of slides, or at least stuff I could almost read off.  I think my problem was that I was trying to emulate other presenters who obviously have better memories than me.  I will remain forever jealous of people who can just look at a single slide and talk about it for 10 minutes seamlessly.&lt;/p&gt;
+
+&lt;p&gt;I practiced my talk &lt;em&gt;alot&lt;/em&gt;, like almost every night for two weeks straight.  I had it down to around 48 minutes (I'd been given 45 minutes), my talk ended up running for 40 minutes even with a few minutes delay due to tech demo issues, because I'd forgotten (or my brain was so frozen) a lot of what I wanted to talk about.  For reference in a previous 15 minute presentation I'd used 22 slides, for this 45 minute presentation I used 26, and a large chunk of those had no talking trigger points associated with them.&lt;/p&gt;
+
+&lt;p&gt;I know I could use presenter notes, but I &lt;em&gt;really&lt;/em&gt; don't like looking like I am squinting down at something in the middle of a talk, but that is certainly a valid alternative.&lt;/p&gt;
+
+&lt;h3 id="settingexpectationsisimportant"&gt;Setting expectations is important&lt;/h3&gt;
+
+&lt;p&gt;As a software developer setting expectations is one of the most important things you can do, and it is for presentations as well.&lt;/p&gt;
+
+&lt;p&gt;One of the themes I really wanted to run with was that Xamarin is a very approachable product to run with and use.  To that end I decided to try and come off as an expert as much as possible throughout my talk and then at the end admit that before working on this talk I'd only done a single proof of concept with it.  Thus, showcasing how approachable it is, and despite needing to pick up an understand of the iOS and Android ecosystems any competent .Net developer can do it.  But I think this ended up creating undue stress on myself during the talk as I was paranoid about making a mistake that would make me look like anything less than an expert.&lt;/p&gt;
+
+&lt;h3 id="knowwhatyourstyleisandsticktoit"&gt;Know what your style is, and stick to it&lt;/h3&gt;
+
+&lt;p&gt;This I think that this is the biggest mistake I made at DDD.  I wanted to come up with a polished professional presentation.  But really, that is not my style.  I tend to invoke my twisted sense of humour into my presentations, and aside from a couple of slides I stuck to the clean and narrow.  &lt;/p&gt;
+
+&lt;p&gt;There were two reasons why I tried to be professional:&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;I had an awful lot of content to go through and didn't feel that I had the time for it  &lt;/li&gt;
+&lt;li&gt;I didn't want to risk even slightly offending or upsetting anyone.  I will freely admit that sometimes I can push the line of acceptable, not veering off like &lt;a href="http://www.theregister.co.uk/2014/06/06/us/"&gt;Maven is my Girlfriend&lt;/a&gt; acceptable, but I was so paranoid about even slightly tweaking someones nose I pretty much left out any of my usual banter.&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;And why was this so bad?  For the first 20 or so minutes of the presentation I basically had no reaction from the audience.  During the talk, at the back of my mind I was thinking to myself that the talk wasn't going well.  In hindsight I realized that it wasn't the audience's fault, they were a &lt;em&gt;great&lt;/em&gt; audience.  The problem was I'd given them &lt;em&gt;nothing&lt;/em&gt; to react to!  I was so used to feedback from my audiences that to have nothing felt like a criticism of my talk.  &lt;/p&gt;
+
+&lt;p&gt;The most important person to feel comfortable in a presentation is the presenter, some people like feedback and audience participation during a presentation and I am definitely one of them.  For reference to my sense of humour here is one of my slides from the presentation where the only person who is likely to be offended is myself.  (Context:  The number of Twitter followers Scott Hanselman and I had at the time)&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://www.devenable.com/content/images/2014/Jul/TwitterFollowers.png" alt=""&gt;&lt;/p&gt;
+
+&lt;h3 id="showingmorethan23filesinacodedemoisabadidea"&gt;Showing more than 2-3 files in a code demo is a bad idea&lt;/h3&gt;
+
+&lt;p&gt;This is one of my pet peeves with presentations and I have no idea why I fell into the same trap.  After two or three files the audience tends to get lost in what you are showing.  It needs to be clear, succinct, and to the point.  &lt;/p&gt;
+
+&lt;p&gt;The code for the demo I was trying to show for those interested can be found &lt;a href="https://github.com/DevEnable/Xamarin.CountWtf"&gt;here&lt;/a&gt;.  I didn't show everything, I talked about the Azure Mobile Service in the slides, but I had about 6 files I was trying to talk people through, and it went OK when I was practicing at home but I don't think people got a lot of value when it was actually showcased.  On top of that I got a bit flustered when the demo didn't work due to network connectivity issues and ended up skipping over a bunch of stuff.&lt;/p&gt;
+
+&lt;p&gt;What I should have done is stuck as much to PowerPoint showing a class or two and explaining the structure clearly through diagrams.&lt;/p&gt;
+
+&lt;h3 id="yourbraindoesntworkproperlyduringapresentation"&gt;Your brain doesn't work properly during a presentation&lt;/h3&gt;
+
+&lt;p&gt;This obviously depends on the individual and how nervous / stressed they are, but I saw a number of presenters make all sorts of small mistakes they wouldn't of made (given that I'd worked with some of them) if they were in a relaxed state.  A very quick and simple fix to the Twitter problem given it is a Windows 8 Store application would of been just to uninstall it.  (Or how to turn off the notification settings as I was advised afterwards)  Obviously it shouldn't have been on in the first place, but I'd never thought of that particular application running in the background.  If I was at home or the office it would have been a 5 second fix.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://www.devenable.com/content/images/2014/Jul/TwitterTrending.png" alt=""&gt;&lt;/p&gt;
+
+&lt;p&gt;I managed to salvage it slightly by stating it was free promotional activity for people who followed me, so there is that :).&lt;/p&gt;
+
+&lt;h3 id="dealingwithproblemslides"&gt;Dealing with problem slides&lt;/h3&gt;
+
+&lt;p&gt;Sometimes there is a slide or two you just can't nail.  I had two slides near the end of the presentation that I just couldn't get to come out right despite the important message I was trying to deliver.  I only came up with this idea just before going to bed, and it seems like such utter common sense, but I loaded up Word and sat down and wrote exactly what I wanted to say allowing me to tweak and modify the words until it was in a state that I was happy with.  I printed out the document and tried to memorize it.  If I'd done it earlier, or skipped some of the presentations so that I could practice it, it would have gone much better (I ended up whipping it out and using it as a reference note at the end of my talk) but I will certainly be saving that trick for the future.&lt;/p&gt;
+
+&lt;h1 id="themorepositivethingsilearned"&gt;The more positive things I learned&lt;/h1&gt;
+
+&lt;h3 id="theaudiencewantsyoutosucceed"&gt;The audience wants you to succeed&lt;/h3&gt;
+
+&lt;p&gt;Unless you're performing at a comedy club no one is likely to actually heckle you.  Both you and your audience want the same outcome, a really awesome presentation.  My audience at DDD were fantastic.&lt;/p&gt;
+
+&lt;h3 id="thedevelopmentcommunityisawesome"&gt;The development community is awesome&lt;/h3&gt;
+
+&lt;p&gt;For my talk I reached out to Scott Hanselman (&lt;a href="https://twitter.com/shanselman"&gt;@shanselman&lt;/a&gt;) and asked him to talk about his startup &lt;a href="http://myechoapp.com/"&gt;myEcho&lt;/a&gt; he produced an awesome 5 minute video for me that not only went down really well with the audience but gave me some time in the middle of the presentation to reset myself.  I also asked Paul Betts (&lt;a href="https://twitter.com/paulcbetts"&gt;@paulcbetts&lt;/a&gt;) to talk about his experiences in open source software development with Xamarin in a set of questions over email and he gave some really insightful answers.&lt;/p&gt;
+
+&lt;p&gt;I'd like to thank both of them publicly for what they did for me, particularly as Scott has probably already blacklisted my email address due to all of the other thank you's I've already sent.&lt;/p&gt;
+
+&lt;p&gt;The DDD Melbourne event once again was a fantastic event clearly all of the organizers, sponsors, speakers, volunteers, and participants at DDD Melbourne made the event what it is.  I'd like to thank all of them, as well as the people that went to and voted for my talk and I hope to be back next year.&lt;/p&gt;</content:encoded></item><item><title>Proof of Concept - Common Mobile Services Client (PCL)</title><description>&lt;p class="intro"&gt;In this blog post I will describe the &lt;a href="http://www.devenable.com/xamarin-android-with-azure-mobile-services-net-blog-series/"&gt;proof of concept&lt;/a&gt; code sharing going on in the common mobile client shared library (Portable Class Library).&lt;/p&gt;
+
+&lt;h2 id="creatingthecommonlibrary"&gt;Creating the common library&lt;/h2&gt;
+
+&lt;p&gt;The basis of this blog post is Paul Batum's &lt;a href="https://github.com/paulbatum/mobile-services-xamarin-pcl"&gt;excellent tutorial&lt;/a&gt; on GitHub.  I am not going to regurgitate what he&lt;/p&gt;</description><link>http://www.devenable.com/proof-of-concept-common-mobile-services-client-pcl/</link><guid isPermaLink="false">7b50012b-ebf9-4c4d-9c81-20ca5600a97c</guid><category>Xamarin</category><dc:creator>Stephen Kennedy</dc:creator><pubDate>Wed, 28 May 2014 12:27:57 GMT</pubDate><content:encoded>&lt;p class="intro"&gt;In this blog post I will describe the &lt;a href="http://www.devenable.com/xamarin-android-with-azure-mobile-services-net-blog-series/"&gt;proof of concept&lt;/a&gt; code sharing going on in the common mobile client shared library (Portable Class Library).&lt;/p&gt;
+
+&lt;h2 id="creatingthecommonlibrary"&gt;Creating the common library&lt;/h2&gt;
+
+&lt;p&gt;The basis of this blog post is Paul Batum's &lt;a href="https://github.com/paulbatum/mobile-services-xamarin-pcl"&gt;excellent tutorial&lt;/a&gt; on GitHub.  I am not going to regurgitate what he has, but I will add a few things.&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;You do not need to download the mobile services sample from Azure.
+&lt;ul&gt;&lt;li&gt;Create a PCL project in Xamarin Studio (or Visual Studio), ensure that it is a PCL project, not a regular C# (or F#) library.&lt;/li&gt;
+&lt;li&gt;Add the Nuget package Microsoft.Net.Http&lt;/li&gt;
+&lt;li&gt;Follow the rest of the steps in the tutorial&lt;/li&gt;&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;Originally I had an older PCL project before I started to refactor my code to share the Azure Mobile Services client logic.  After following the instructions I was getting compile errors complaining that it could not find the IDisposable interface in version 4.0 of the .Net framework.  This was a &lt;a href="http://stackoverflow.com/questions/20688379/monodroid-with-windows-azure-mobile-services-system-runtime-reference-error"&gt;bug&lt;/a&gt; that has since been fixed, however, it looks like the bug was to do with the csproj, not VS/Xamarin Studio, so either create a new project like I did, or if that is not feasible, look at project file in the tutorial and do a diff.&lt;/li&gt;
+&lt;li&gt;I didn't need to follow the WP8 instructions.  I just needed to add the appropriate Nuget packages.&lt;/li&gt;
+&lt;li&gt;I will go through this in the iOS tutorial, but you for that platform you need to call CurrentPlatform.Init()&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;hr&gt;
+
+&lt;h2 id="thecode"&gt;The code&lt;/h2&gt;
+
+&lt;pre&gt;&lt;code class="language-prettyprint lang-cs"&gt;public interface IDataClient  
+{
+    Task&amp;lt; IEnumerable &amp;lt;InternetLocation &amp;gt;&amp;gt; GetLocations( double latitude,  double longitude);
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code class="language-prettyprint lang-cs"&gt;public class DataClient : IDataClient  
+{
+    private readonly MobileServiceClient _client = newMobileServiceClient ("https://yourmobileservice.azure-mobile.net/" ,"xxKEYxx" );
+
+    public Task&amp;lt; IEnumerable &amp;lt;InternetLocation &amp;gt;&amp;gt; GetLocations( double latitude, double longitude)
+    {
+        return _client.GetTable&amp;lt; InternetLocation &amp;gt;().WithParameters(
+                            new Dictionary &amp;lt;string , string &amp;gt;
+                           {
+                                  { "longitude" , longitude.ToString(CultureInfo .InvariantCulture)},
+                                  { "latitude" , latitude.ToString(CultureInfo .InvariantCulture)}
+                           }).ToEnumerableAsync();
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Obviously replace the URL and key with your own.  The code here is pretty straight forward.  If you go back to my &lt;a href="http://www.devenable.com/azure-mobile-services-mapped-tablecontroller/"&gt;TableController blog post&lt;/a&gt; it will call the GetLocationsNear method on the InternetLocationController using the passed in longitude and latitude.  &lt;/p&gt;
+
+&lt;hr&gt;
+
+&lt;h2 id="waitshouldnttherebemorecommoncode"&gt;Wait, shouldn't there be more common code?&lt;/h2&gt;
+
+&lt;p&gt;At this point you may be wondering why there isn't more code sharing going on.  In terms of illustrating code sharing this proof of concept may have been a poor choice, as I will illustrate in future blog posts the mapping functionality by its nature (and the nature of the platforms) is very view specific which is where you need to craft platform specific code.&lt;/p&gt;
+
+&lt;p&gt;&lt;a href="https://github.com/MvvmCross/MvvmCross"&gt;MvvmCross&lt;/a&gt; and &lt;a href="https://github.com/xamarin/Xamarin.Mobile"&gt;Xamarin.Mobile&lt;/a&gt; allow you to use a common location component.  While for my proof of concept I did not go down this route, it is certainly available to you.&lt;/p&gt;
+
+&lt;p&gt;Hopefully though, even with this small example, you will start to see the power of what Xamarin offers.&lt;/p&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;&lt;strong&gt;Update:&lt;/strong&gt;  Xamarin just announced &lt;a href="http://xamarin.com/forms"&gt;Xamarin.Forms&lt;/a&gt; which has a maps control.  Looking at the sample code, however, at the moment it only supports pins.  You will need to install the Nuget package (Xamarin.Forms.Maps) to get the maps installed.  At present the sample doesn't support Android due to a Google Maps API key dependency.  The sample can be found &lt;a href="https://github.com/xamarin/xamarin-forms-samples/tree/master/FormsGallery"&gt;here&lt;/a&gt;.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;hr&gt;</content:encoded></item><item><title>Creating an Apple Maps custom overlay image with Xamarin</title><description>&lt;p class="intro"&gt;Want to add an Apple Maps image overlay with Xamarin?  Heres how!&lt;/p&gt;
+
+&lt;p&gt;When working on my &lt;a href="http://www.devenable.com/xamarin-android-with-azure-mobile-services-net-blog-series/"&gt;proof of concept&lt;/a&gt; one especially large pain point was figuring out how to add a correctly scaled image overlay to my maps in order to display the represented WiFi signal range.  In this blog&lt;/p&gt;</description><link>http://www.devenable.com/creating-an-apple-maps-custom-overlay-image-with-xamarin/</link><guid isPermaLink="false">d9b97305-587d-4c17-b658-75e433c55175</guid><category>Xamarin</category><dc:creator>Stephen Kennedy</dc:creator><pubDate>Sun, 25 May 2014 05:30:36 GMT</pubDate><content:encoded>&lt;p class="intro"&gt;Want to add an Apple Maps image overlay with Xamarin?  Heres how!&lt;/p&gt;
+
+&lt;p&gt;When working on my &lt;a href="http://www.devenable.com/xamarin-android-with-azure-mobile-services-net-blog-series/"&gt;proof of concept&lt;/a&gt; one especially large pain point was figuring out how to add a correctly scaled image overlay to my maps in order to display the represented WiFi signal range.  In this blog post I will take you through how this is done.&lt;/p&gt;
+
+&lt;h2 id="addingtheoverlay"&gt;Adding the overlay&lt;/h2&gt;
+
+&lt;p&gt;Since I am denoting a range, the obvious overlay to use is MKCircle, and the code for this is pretty simple.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class="language-prettyprint lang-cs"&gt;MKCircle wifiRange = MKCircle.Circle (annotation.Coordinate, 200);  
+this.InternetLocationsMap.AddOverlay(wifiRange);
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;strong&gt;Note:&lt;/strong&gt; InternetLocationsMaps is my MKMapView.&lt;/p&gt;
+
+&lt;p&gt;I’m just using arbitrary range of 200 metres here.  (Which is generous for a consumer grade WiFi device I know)&lt;/p&gt;
+
+&lt;hr&gt;
+
+&lt;h2 id="mapdelegate"&gt;MapDelegate&lt;/h2&gt;
+
+&lt;p&gt;If you look at the Xamarin documentation it will talk about &lt;a href="http://docs.xamarin.com/guides/ios/platform_features/ios_maps_walkthrough/"&gt;creating a custom annotation&lt;/a&gt;, and the path we are going to take here is very similar.  &lt;/p&gt;
+
+&lt;p&gt;The pertinent code here is:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class="language-prettyprint lang-cs"&gt;private class MapDelegate : MKMapViewDelegate  
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code class="language-prettyprint lang-cs"&gt;            public override MKOverlayRenderer OverlayRenderer(MKMapView mapView, IMKOverlay overlay)
+            {
+                return new WiFiRangeOverlayRenderer (overlay, WifiRange);
+            }
+
+            public override MKOverlayView GetViewForOverlay(MKMapView mapView, NSObject overlay)
+            {
+                return new WifiRangeOverlayView (overlay, WifiRange);
+            }
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;The OverlayRenderer is for iOS 7, the GetViewForOverlay override is for older versions of iOS.  If running an iOS 7 device and an OverlayRender method is implemented the GetViewForOverlay logic will not fire.  &lt;/p&gt;
+
+&lt;p&gt;Just make sure that your map uses the delegate (I do this inside the controllers ViewDidLoad) method:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class="language-prettyprint lang-cs"&gt;this.InternetLocationsMap.Delegate = new MapDelegate ();  
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;hr&gt;
+
+&lt;h2 id="overlayviewrenderer"&gt;Overlay view / renderer&lt;/h2&gt;
+
+&lt;p&gt;I am going to show these two classes together, because in the case of this example their code is basically identical.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class="language-prettyprint lang-cs"&gt;internal class WiFiRangeOverlayRenderer : MKOverlayRenderer  
+    {
+        private readonly WiFiRangeImageHelper _helper;
+
+        public WiFiRangeOverlayRenderer(IMKOverlay overlay, UIImage image) : base(overlay)
+        {
+            _helper = new WiFiRangeImageHelper (overlay, image);
+        }
+
+        public override void DrawMapRect (MKMapRect mapRect, float zoomScale, MonoTouch.CoreGraphics.CGContext context)
+        {
+            _helper.DrawMapRect (mapRect, context, this.RectForMapRect);
+        }
+    }
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code class="language-prettyprint lang-cs"&gt;internal class WifiRangeOverlayView : MKOverlayView  
+    {
+        private readonly WiFiRangeImageHelper _helper;
+
+        public WifiRangeOverlayView (NSObject overlay, UIImage image) : base(overlay)
+        {
+            _helper = new WiFiRangeImageHelper (overlay, image);
+        }
+
+        public override void DrawMapRect (MKMapRect mapRect, float zoomScale, MonoTouch.CoreGraphics.CGContext context)
+        {
+            _helper.DrawMapRect (mapRect, context, this.RectForMapRect);
+        }
+    }
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;All they effectively do is daisy chain the logic into the WiFiRangeImageHelper class which is explained below.&lt;/p&gt;
+
+&lt;hr&gt;
+
+&lt;h2 id="drawingtheimage"&gt;Drawing the image&lt;/h2&gt;
+
+&lt;p&gt;The helper class I am calling is where all of the work happens.  &lt;/p&gt;
+
+&lt;pre&gt;&lt;code class="language-prettyprint lang-cs"&gt;internal class WiFiRangeImageHelper  
+    {
+        private readonly UIImage _wifiRangeImage;
+        private readonly MKMapRect _mapBounds;
+
+        public WiFiRangeImageHelper(object overlay, UIImage image)
+        {
+            _wifiRangeImage = image;
+            _mapBounds = ((MKCircle)overlay).BoundingMapRect;
+        }
+
+        public void DrawMapRect (MKMapRect mapRect, MonoTouch.CoreGraphics.CGContext context, Func&amp;lt;MKMapRect, RectangleF&amp;gt; calculateDisplayRectangle)
+        {
+            RectangleF bounds = calculateDisplayRectangle(_mapBounds);
+            context.ScaleCTM (1, -1);
+            context.TranslateCTM (0, -bounds.Height);
+            context.DrawImage (bounds, _wifiRangeImage.CGImage);
+        }
+    }
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;There are a few things to note here.&lt;/p&gt;
+
+&lt;p&gt;My whole naming / implementation approach was pretty lazy, it is just a proof of concept though, and I'm sure you can do better.&lt;/p&gt;
+
+&lt;p&gt;I wasn’t able to figure out why the constructors overlay size was different from the one passed into DrawMapRect, but it looked far more correct.&lt;/p&gt;
+
+&lt;p&gt;The Func&lt;mkmaprect, rectangle=""&gt; gives an opportunity for the MKOverlayView and MKOverlayRenderer to pass in their logic for converting map based dimensions to a drawable bound on the screen.&lt;/mkmaprect,&gt;&lt;/p&gt;
+
+&lt;p&gt;If you want an explanation of the logic within DrawMapRect I suggest you take a look at the &lt;a href="http://docs.xamarin.com/guides/ios/application_fundamentals/graphics_animation_ios/"&gt;Xamarin documentation&lt;/a&gt; but basic cliff notes are.&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Correct the image so that its origin is in the top left corner instead of the bottom right (which is the default).  For my image this doesn’t make a difference as it is a circle radial, but I have included the logic for completeness.&lt;/li&gt;
+&lt;li&gt;Draw the image onto the users screen.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;Note:  If looking at Objective C examples please note that Xamarin does not use a number of Apple types for drawing.  From their &lt;a href="http://docs.xamarin.com/guides/ios/under_the_hood/api_design/"&gt;documentation&lt;/a&gt; - they have replaced CGRect, CGPoint, and CGSize with System.Drawing types.  &lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;hr&gt;
+
+&lt;h2 id="resources"&gt;Resources&lt;/h2&gt;
+
+&lt;p&gt;I used a combination of online resources to figure this out.  The key resource for this was an &lt;a href="http://www.raywenderlich.com/30001/overlay-images-and-overlay-views-with-mapkit-tutorial"&gt;excellent blog post&lt;/a&gt; written by Ray Wenderlich which explains in Objective C how this is done.  &lt;/p&gt;
+
+&lt;p&gt;I also used these resources for my translation to Xamarin / C#:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Xamarin iOS &lt;a href="http://docs.xamarin.com/recipes/ios/content_controls/map_view/add_an_overlay_to_a_map/"&gt;overlay documentation&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;Xamarin &lt;a href="http://iosapi.xamarin.com/index.aspx?link=M%3AMonoTouch.MapKit.MKOverlayView.RectForMapRect(MonoTouch.MapKit.MKMapRect)"&gt;RectForMapRect documentation&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;Apples &lt;a href="https://developer.apple.com/library/ios/documentation/MapKit/Reference/MapKitDataTypesReference/Reference/reference.html"&gt;MapKit datatypes&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;One thing this exercise has taught me though.  I really need to learn how to read Objective C code.&lt;/p&gt;</content:encoded></item><item><title>Azure Mobile Services Mapped TableController</title><description>&lt;p class="intro"&gt;This blog post details how the Mobile Services ApiController serves up data to the mobile clients in my &lt;a href="http://www.devenable.com/xamarin-android-with-azure-mobile-services-net-blog-series/"&gt;proof of concept&lt;/a&gt;.&lt;/p&gt;  
+
+&lt;hr&gt;
+
+&lt;p&gt;By default Azure Mobile Services provides a DomainManager which directly exposes the entity over the wire.  Often, particularly for more complex systems you do not want to directly expose&lt;/p&gt;</description><link>http://www.devenable.com/azure-mobile-services-mapped-tablecontroller/</link><guid isPermaLink="false">e751e7bd-148d-4fe4-9b86-06fecec3e7b8</guid><category>Mobile Services</category><dc:creator>Stephen Kennedy</dc:creator><pubDate>Wed, 14 May 2014 10:36:48 GMT</pubDate><content:encoded>&lt;p class="intro"&gt;This blog post details how the Mobile Services ApiController serves up data to the mobile clients in my &lt;a href="http://www.devenable.com/xamarin-android-with-azure-mobile-services-net-blog-series/"&gt;proof of concept&lt;/a&gt;.&lt;/p&gt;  
+
+&lt;hr&gt;
+
+&lt;p&gt;By default Azure Mobile Services provides a DomainManager which directly exposes the entity over the wire.  Often, particularly for more complex systems you do not want to directly expose your underlying entities, but expose contracts crafted specifically for the service.  And, in the case of the proof of concept we cannot directly expose all of the entity data as the InternetLocation class contains a DbGeography property that cannot be serialized.&lt;/p&gt;
+
+&lt;p&gt;There are two reasons why we want to expose a separate service contract.  Firstly, our entity has a member of type DbGeography.  This type cannot be serialized in its current format.  We expose a contract of type MapLocation in its place which contains the longitude and latitude of the location.  Secondly, in many cases you do not want to expose your internal entities directly over the wire.  There are many blog posts on the Internet regarding this, but the simple nutshell is that by exposing your internal entities over the wire you are leaking your internal implementation, and you are unable to create contracts specifically to meet your clients needs.  &lt;/p&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;For a refresher on the data contracts we are using see &lt;a href="http://www.devenable.com/proof-of-concept-data/"&gt;here&lt;/a&gt;.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;hr&gt;
+
+&lt;h2 id="mappedentitydomainmanager"&gt;MappedEntityDomainManager&lt;/h2&gt;
+
+&lt;p&gt;As I stated above, the default template for an Azure Mobile Services TableController exposes entities, however, we want to expose a different service contract.  By inheriting from the MappedEntityDomainManager which is briefly described &lt;a href="http://blogs.msdn.com/b/mim/archive/2014/02/28/windows-azure-mobiles-services-c-backend-en-version.aspx"&gt;here&lt;/a&gt; we are able to internally utilize our persisted entities while exposing service contracts.&lt;/p&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;&lt;em&gt;Note:&lt;/em&gt; As engineers we tend to scour the Internet quite often looking for answers to problems, and as such, blog posts, tend to contain, answers instead of questions.  Unfortunately, this is not such a blog post.  I've been looking at the recently released Azure Mobile Services (.Net) backend libraries and while I have a working solution, at present this is probably not what the Azure team was after in terms of best practice.  Hopefully, if the Azure team can update their documentation / guidance I will come back and update this blog post.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;MappedEntityDomainManager uses &lt;a href="http://automapper.org/"&gt;AutoMapper&lt;/a&gt; to map between the domain entities and service contracts.&lt;/p&gt;
+
+&lt;hr&gt;
+
+&lt;h3 id="internetlocationdomainmanager"&gt;InternetLocationDomainManager&lt;/h3&gt;
+
+&lt;p&gt;Arguably, I should have explained this class in the data blog post.  However, I decided that it would be clearer what was going on if explained in conjunction with the TableController.&lt;/p&gt;
+
+&lt;p&gt;For my implementation I used the &lt;a href="https://github.com/WindowsAzure/azure-mobile-services/blob/master/test/ZumoE2EServerApp/Utils/ComplexTypeDomainManager.cs"&gt;sample class&lt;/a&gt; as a baseline.  While I have implemented the abstract members as per the sample, unfortunately I could not verify that they are actually being called(see testing the mapping).&lt;/p&gt;
+
+&lt;h3 id="entitymappings"&gt;Entity mappings&lt;/h3&gt;
+
+&lt;p&gt;I made my AutoMapper mappings part of the WebApiConfig.Register method call.  The mappings are as such:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class="language-prettyprint lang-cs"&gt; Mapper.Initialize(cfg =&amp;gt;
+            {
+                cfg.CreateMap&amp;lt; DbGeography, MapLocation &amp;gt;()
+                    .ForMember(dst =&amp;gt; dst.Latitude, map =&amp;gt; map.MapFrom(s =&amp;gt; s.Latitude.Value))
+                    .ForMember(dst =&amp;gt; dst.Longitude, map =&amp;gt; map.MapFrom(s =&amp;gt; s.Longitude.Value));
+
+                cfg.CreateMap&amp;lt; InternetLocation, InternetLocationModel &amp;gt;()
+                    .ForMember(dst =&amp;gt; dst.Location, map =&amp;gt; map.MapFrom(s =&amp;gt; s.Location));
+            });
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Since I am only doing a one-way mapping from my domain entity to the service contract I only require one way mappings.  One for the InternetLocationModel that I expose, and one for the MapLocation model that is part of the InternetLocationModel contract.&lt;/p&gt;
+
+&lt;hr&gt;
+
+&lt;h3 id="testingthatthemappingworks"&gt;Testing that the mapping works&lt;/h3&gt;
+
+&lt;p&gt;This bit is weird.  It may just have been my development environment (recent rebuild) but I cannot seem to get the debugger to hit a breakpoint on my InternetLocationDomainManager (it will break on my TableController).  Through the responses that come back from the service though I have been able to verify that the mapping is occurring.  This is both through the mobile applications which have their own custom method, as well as through the webpages that Microsoft provide you to test with.  A call to the service with the relative URL of:&lt;/p&gt;
+
+&lt;p&gt;&lt;em&gt;tables/InternetLocation?$filter=(hasWifi eq true)&lt;/em&gt;&lt;/p&gt;
+
+&lt;p&gt;Will return only the Internet locations that have WiFi in the expected JSON format.&lt;/p&gt;
+
+&lt;hr&gt;
+
+&lt;h3 id="thecode"&gt;The Code&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code class="language-prettyprint lang-cs"&gt;public class InternetLocationDomainManager : MappedEntityDomainManager &amp;lt;InternetLocationModel , InternetLocation &amp;gt;  
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;You will see in this class declaration that there are two generic arguments.  The first generic argument is the type that will be exposed over the wire, the second is for the persisted entity type.  One thing that I did not mention in my discussion about the &lt;a href="http://www.devenable.com/proof-of-concept-data/"&gt;proof of concept data types&lt;/a&gt; is that InternetLocationModel inherits from ITableData, this is due to the generic where constraint on the first generic type argument.  I'm not going to go into too much detail on all of the abstract method overloads as the sample class is pretty easy to follow.  But I will showcase two of the methods involved in mapping.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class="language-prettyprint lang-cs"&gt;protected override SingleResult &amp;lt;InternetLocationModel &amp;gt; LookupEntity(Expression &amp;lt;Func &amp;lt;InternetLocation , bool &amp;gt;&amp;gt; filter)  
+        {
+            DataVicContext context = (DataVicContext ) this .Context;
+
+            return SingleResult .Create(context.InternetLocations.Where(filter)
+                .Select( Mapper.Map&amp;lt; InternetLocationModel &amp;gt;).AsQueryable());
+        }
+public override SingleResult &amp;lt;InternetLocationModel &amp;gt; Lookup( string id)  
+        {
+            var key = GetKey&amp;lt; string&amp;gt;(id);
+            InternetLocation location = this .Context.Set&amp;lt;InternetLocation &amp;gt;().Find(key);
+            List&amp;lt; InternetLocationModel &amp;gt; result = new List &amp;lt;InternetLocationModel &amp;gt;();
+
+            if (location != null)
+            {
+                result.Add( Mapper.Map&amp;lt; InternetLocationModel &amp;gt;(location));
+            }
+
+            return SingleResult .Create(result.AsQueryable());
+        }
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;These methods are what perform the mapping between the internal entity and the exposed service contract.  &lt;/p&gt;
+
+&lt;hr&gt;
+
+&lt;h2 id="internetlocationcontroller"&gt;InternetLocationController&lt;/h2&gt;
+
+&lt;p&gt;As we are using a different DomainManager from the standard template the code here is also a bit different.  This is the entire class in all of its glory:  &lt;/p&gt;
+
+&lt;pre&gt;&lt;code class="language-prettyprint lang-cs"&gt;public class InternetLocationController : TableController &amp;lt;InternetLocationModel &amp;gt;  
+    {
+        private DataVicContext _context;
+
+        protected override void Initialize( HttpControllerContext controllerContext)
+        {
+            base.Initialize(controllerContext);
+            _context = new DataVicContext (Services.Settings.Name);
+            this.DomainManager = new InternetLocationDomainManager (_context, Request, Services);
+        }
+
+        /// &amp;lt;summary&amp;gt;
+        /// Gets all of the locations that have internet available.
+        /// &amp;lt;/summary&amp;gt;
+        /// &amp;lt;returns&amp;gt; Internet locations. &amp;lt;/returns&amp;gt;
+        public IQueryable &amp;lt;InternetLocationModel &amp;gt; GetLocations()
+        {
+            return this.Query();
+        }
+
+        /// &amp;lt;summary&amp;gt;
+        /// Gets all of the internet locations given near a given geography point and within a certain range.
+        /// &amp;lt;/summary&amp;gt;
+        /// &amp;lt;param name="longitude"&amp;gt; Longitude of the location to use as the center of the search.&amp;lt;/param&amp;gt;
+        /// &amp;lt;param name="latitude"&amp;gt; Latitude of the location to use as the center of the search.&amp;lt;/param&amp;gt;
+        /// &amp;lt;param name="distance"&amp;gt; Distance in metres to search out from. &amp;lt;/param&amp;gt;
+        /// &amp;lt;returns&amp;gt; All of the internet locations within the distance from the given point.&amp;lt;/returns&amp;gt;
+        public IEnumerable &amp;lt;InternetLocationModel &amp;gt; GetLocationsNear( double latitude, double longitude, long distance = 2000)
+        {
+            try
+            {
+                 DbGeography geoLocation = GeographyHelper .FromLatitudeLongitude(latitude, longitude);
+                var dbLocations = ( from l in _context.InternetLocations
+                                   where l.Location.Distance(geoLocation) &amp;lt; distance
+                                   select l).ToList();
+
+                return dbLocations.Select( Mapper.Map&amp;lt; InternetLocationModel &amp;gt;);
+            }
+            catch ( Exception ex)
+            {
+                Services.Log.Error(ex);
+                throw;
+            }
+        }
+    }
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;The bulk of the logic that performs the actual query against the database is explained in a &lt;a href="http://rbrundritt.wordpress.com/2012/06/08/entity-framework-5-bing-maps-wpf/"&gt;blog post&lt;/a&gt; I found during development.  As you can see I have a bit of a hack involved in my custom API method as I am completely bypassing the DomainManager and using the EF context directly.  This is because I could not figure out how to perform a distance calculation using the InternetLocationDomainManager.  The call to this.Query exposes an InternetLocationModel which is what we return via the service, but, I need to be able to query against the underlying DbGeography class so that I can use the inbuilt spatial data types to query distances.&lt;/p&gt;
+
+&lt;p&gt;This is the only method that the mobile applications actually call.  They use their inbuilt location services (described in later blog posts) to calculate their location, call the service with their location and then get a set of publicly available Internet locations.&lt;/p&gt;
+
+&lt;p&gt;I would &lt;strong&gt;&lt;em&gt;gladly&lt;/em&gt;&lt;/strong&gt; accept guidance from the Azure team or community on how to best resolve this.&lt;/p&gt;</content:encoded></item><item><title>Lessons Learned in a Brownfield World</title><description>&lt;p class="intro"&gt;From ten years of greenfield and startup projects to brownfield development, this is what I learnt.&lt;/p&gt;
+
+&lt;p&gt;I've been with &lt;a href="http://readify.net"&gt;Readify&lt;/a&gt; for around 14 months now.  Previous to that I'd largely worked on greenfield projects, be they entirely brand new solutions, or re-writes across a range of clients from startups to&lt;/p&gt;</description><link>http://www.devenable.com/lessons-learnt-in-a-brownfield-world/</link><guid isPermaLink="false">cb3ce10a-73ab-4acb-b50d-8482285a2f9a</guid><dc:creator>Stephen Kennedy</dc:creator><pubDate>Mon, 05 May 2014 09:28:29 GMT</pubDate><content:encoded>&lt;p class="intro"&gt;From ten years of greenfield and startup projects to brownfield development, this is what I learnt.&lt;/p&gt;
+
+&lt;p&gt;I've been with &lt;a href="http://readify.net"&gt;Readify&lt;/a&gt; for around 14 months now.  Previous to that I'd largely worked on greenfield projects, be they entirely brand new solutions, or re-writes across a range of clients from startups to large enterprise organizations.  Since joining Readify I've pretty much exclusively worked on brownfield projects and it has been interesting to observe (and participate) projects where the consequences of previously made short-term decisions have played out and seeing the true cost of those outcomes.&lt;/p&gt;
+
+&lt;p&gt;In my life before Readify I'd generally only involved at the inception and initial creation of a solution.  As an engineer I'd known that testing is good, all about &lt;a href="http://en.wikipedia.org/wiki/SOLID_(object-oriented_design)"&gt;SOLID&lt;/a&gt; principles, and the many other gems of best practice.  I could repeat the rhetoric and attempt to push back when shortcuts were being made, but I'd never really fight it, because like the decision makers I was reporting to I didn't really appreciate the cost of these short-term decisions.&lt;/p&gt;
+
+&lt;hr&gt;
+
+&lt;h2 id="iftechnicaldebtisbadwhydoweletithappen"&gt;If technical debt is bad why do we let it happen?&lt;/h2&gt;
+
+&lt;p&gt;&lt;a href="http://en.wikipedia.org/wiki/Technical_debt"&gt;Technical debt&lt;/a&gt; occurs, and almost every project with a reasonable lifetime has some amount of technical debt.  Technical debt often occurs due to short-term decisions being made (be it by the product owner, or the development team), sometimes it occurs because the engineers simply didn’t know better, or a legitimate mistake being made by someone.&lt;/p&gt;
+
+&lt;p&gt;I feel that it is important to point out that &lt;a href="http://en.wikipedia.org/wiki/Omniscience"&gt;Omniscience&lt;/a&gt; is still out of the reach of humankind, and this post isn’t necessarily about obtaining perfection, but it is about being productive and competitive through the long-term.&lt;/p&gt;
+
+&lt;p&gt;Technical debt, like financial debt isn’t evil, it isn’t something you want too much of, but something that needs to be managed. &lt;/p&gt;
+
+&lt;hr&gt;
+
+&lt;h2 id="wedontknowthetruecostoftechnicaldebt"&gt;We don't know the true cost of technical debt&lt;/h2&gt;
+
+&lt;p&gt;But really what does this technical debt cost us?  Particularly when we want to feed it back to the decision makers.  Unlike financial debt it isn’t something that can be accurately be measured back with interest figures in a neat little spreadsheet. &lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://www.devenable.com/content/images/2014/May/Spreadsheet.png" alt=""&gt;&lt;/p&gt;
+
+&lt;p&gt;One thing I encourage teams to do when meeting resistance from the decision makers about addressing technical debt is when working on their new features and enhancements to report back on how long it would of taken if the codebase was in reasonable shape.  &lt;/p&gt;
+
+&lt;p&gt;For example I needed to incorporate server-side caching in a system that was suffering performance problems which in a codebase of reasonable quality should have taken around 3 days, it ended up taking me 3 weeks due to a massively convoluted codebase with no reliable automated testing.  So the accrued interest on that technical debt for this piece of work is a productivity cost of around 400%.  Obviously different changes to the same component may result in different results but hopefully through averages you will get a clearer picture of cost.  Now as the client wants to make far reaching changes to the system as a whole and it affects this component and the decision has been made to re-write it.  &lt;/p&gt;
+
+&lt;hr&gt;
+
+&lt;h2 id="automatedtestsareyourmoneyforarainyday"&gt;Automated tests are your money for a rainy day&lt;/h2&gt;
+
+&lt;p&gt;&lt;img src="http://www.devenable.com/content/images/2014/May/MoneyJar.png" alt=""&gt;&lt;/p&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;We do not have time to write tests.  We need new features.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;Many startups make this claim.  Often they feel pressured by a time to market, particularly if they have no real revenue.  More established organisations will also weakly make this claim citing competitors that already have this feature, or concern that they are catching up.  Having written a test if you later ignore it in order to check in a change this is as good as that test never existing in the first place as over the ravages of time it can no longer be trusted.&lt;/p&gt;
+
+&lt;p&gt;When many people think of automated tests, they only think of it in terms of quality assurance, that the product you are shipping is of a reasonable standard.  That is definitely one benefit, and an important one, but there is another benefit often neglected that I would argue is equally as important.  A solution with good automated test coverage gives you the ability to make improvements (such as tackling technical debt) without complete fear of change.  The better your testing, the less risk that there is associated with change.  Some organisations are so scared to change anything at all unless absolutely necessary as the risk is just far too great due to the lack of tests.  Tests in a way form an important part of the documentation of your codebase, documentation is valuable, however, it can get out of date, however, a test is always able to verify itself against the codebase.&lt;/p&gt;
+
+&lt;p&gt;I would much rather deal with a badly designed system, with poor coding, and riddled with technical debt, but containing a good suite of automated tests, than the other way round.  It is actually much easier to correct a poor implementation than large gaps in the knowledge of expected behaviour that automated tests provide.&lt;/p&gt;
+
+&lt;p&gt;Also, you need a proper suite of tests.  Not just end to end tests, but integration tests, unit tests, and possibly even BDD tests if you are that way inclined.  &lt;/p&gt;
+
+&lt;p&gt;The longer you leave between initially writing the functionality and writing the automated tests, the greater likelihood that there will be a gap in the automated testing.  &lt;a href="http://en.wikipedia.org/wiki/Test-driven_development"&gt;Test-driven development&lt;/a&gt; has its proponents for good reason.&lt;/p&gt;
+
+&lt;p&gt;I’m not a zealot, you don’t need 100% coverage, but you do need enough testing to accurately capture the intent of the system as well as the edge cases.  &lt;/p&gt;
+
+&lt;hr&gt;
+
+&lt;h2 id="whyknowingallofthetheoryoftenisntenough"&gt;Why knowing all of the theory often isn't enough&lt;/h2&gt;
+
+&lt;p&gt;&lt;em&gt;To all of the budding tech start-up entrepreneurs out there - If you are lucky enough to have never worked on a brownfield project before I would highly encourage that you participate in working on an actively developed codebase say 6+ years of age before you start on your new venture.&lt;/em&gt;&lt;/p&gt;
+
+&lt;p&gt;As I stated at the start of this blog post, I knew the theory, and I followed it (to an extent), but I didn’t rally push back hard enough and I probably wasn’t as thorough with my automated testing as I should have been.  You may be more disciplined than me, but many people (including myself) only really learn by their mistakes, and it is far better to see and understand the outcomes of making these sorts of decisions to really appreciate the why when it comes to testing and managing tech debt.&lt;/p&gt;
+
+&lt;p&gt;I have seen a few organisations now that are so crippled by their lack of testing and technical debt that the productivity of their developers is crawling and the end user is becoming more and more aware of the quality and technical debt issues that are occurring.  Unless these organisation have strong commercial ties keeping their customer base their competitors eventually start bleeding their market share.  That or they end up burning a lot of money and suffer a loss of momentum on a rewrite.&lt;/p&gt;</content:encoded></item><item><title>Finding Locations With Bing Maps on a Server</title><description>&lt;p class="intro"&gt;This blog post is supplementary to the &lt;a href="http://www.devenable.com/azure-mobile-services-scheduled-jobs/"&gt;Azure Mobile Services Scheduled Jobs&lt;/a&gt; blog post.  In this blog post I will briefly go over getting a server to query the Bing Maps REST API in order to find geo-location data for a supplied address.&lt;/p&gt;
+
+&lt;h2 id="itsnotjustaboutcode"&gt;It's Not Just About Code&lt;/h2&gt;
+
+&lt;p&gt;But, before&lt;/p&gt;</description><link>http://www.devenable.com/finding-locations-with-bing-maps-on-a-server/</link><guid isPermaLink="false">eae44df6-978d-49a9-a8be-e7d0ca71c708</guid><dc:creator>Stephen Kennedy</dc:creator><pubDate>Sun, 27 Apr 2014 04:04:51 GMT</pubDate><content:encoded>&lt;p class="intro"&gt;This blog post is supplementary to the &lt;a href="http://www.devenable.com/azure-mobile-services-scheduled-jobs/"&gt;Azure Mobile Services Scheduled Jobs&lt;/a&gt; blog post.  In this blog post I will briefly go over getting a server to query the Bing Maps REST API in order to find geo-location data for a supplied address.&lt;/p&gt;
+
+&lt;h2 id="itsnotjustaboutcode"&gt;It's Not Just About Code&lt;/h2&gt;
+
+&lt;p&gt;But, before you can being calling the Bing API you need to set up an API key so that Bing can identify who is calling it.  In many situations this is a free service, however, there are some cases where Microsoft will charge you to utilize the Bing API.  Microsoft have a great little &lt;a href="http://www.microsoft.com/maps/Licensing/licensing.aspx"&gt;questionnaire&lt;/a&gt; that will help you to figure out if there is any cost involved in the use of their API.  For my proof of concept since I would be providing this application as a free public consumer mobile application it has no costs associated with it. &lt;/p&gt;
+
+&lt;p&gt;There may also be quota restrictions around the usage of the API depending on your level of licensing.  Consult the Bing Maps &lt;a href="http://www.microsoft.com/maps/Licensing/licensing.aspx"&gt;licensing page&lt;/a&gt; for more information.&lt;/p&gt;
+
+&lt;hr&gt;
+
+&lt;h2 id="obtainingabingmapsapikey"&gt;Obtaining a Bing Maps API Key&lt;/h2&gt;
+
+&lt;p&gt;First up, visit the &lt;a href="http://www.bingmapsportal.com/"&gt;Bing Maps Portal&lt;/a&gt; and sign in with your Microsoft account.   Fill in all of the necessary information required to create an account and then go to the Create or view keys link.  Fill in a few basic details about your application and then you should have a key.  Take this key and then use it when creating requests on the Bing Maps API. &lt;/p&gt;
+
+&lt;p&gt;When creating an instance of the BingGeoCoder you supply this API key as its constructor argument.  The BingGeoCoder will include this key as part of all geo-location requests.  This key correlates to the key querystring parameter in the REST API.&lt;/p&gt;
+
+&lt;hr&gt;
+
+&lt;h2 id="binggeocodinghelper"&gt;Bing Geocoding Helper&lt;/h2&gt;
+
+&lt;p&gt;BingGeoCodingHelper is a small &lt;a href="http://www.nuget.org/packages/BingGeocodingHelper"&gt;Nuget&lt;/a&gt; package that I found which acts as a .Net wrapper for Bing's REST API.  It is fairly basic, and you will probably want to roll your own for production purposes, but for my proof of concept it was adequate.  You can at least use it as a starting point, at least in terms of how to start calling Bing's API.  It is open source and &lt;a href="http://www.nuget.org/packages/BingGeocodingHelper"&gt;present on Github&lt;/a&gt;.&lt;/p&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;&lt;strong&gt;Note:&lt;/strong&gt;  If you look at BingGeoCoder's source code you will see that its Geocode method that takes a set of address parameters is hard coded to US.  You may need to create your own query.  The Rest API location documentation can be found &lt;a href="http://msdn.microsoft.com/en-us/library/ff701714.aspx"&gt;here&lt;/a&gt; 
+  .&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;hr&gt;
+
+&lt;h2 id="querying"&gt;Querying&lt;/h2&gt;
+
+&lt;p&gt;Here is the call I make through BingGeoCoder in my proof of concept.  As I want to persist this information in my database I am converting the result to the &lt;a href="http://msdn.microsoft.com/en-us/library/system.data.spatial.dbgeography.aspx"&gt;DbGeography&lt;/a&gt; class, however, you can do whatever you want with the result sent back by Bing Maps.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class="language-prettyprint lang-cs"&gt;public DbGeography GetGeography(string address, string suburb, int postCode)  
+{
+     BingGeocoderResult result = _client.Geocode(String .Format(" {0}, {1} , {2}, Australia", address, suburb, postCode));
+
+     if (result.Confidence == "No results")
+     {
+         return null;
+     }
+
+     return GeographyHelper.FromLatitudeLongitude(double .Parse(result.Latitude), double.Parse(result.Longitude));
+}
+
+public static class GeographyHelper  
+{
+    public static DbGeography FromLatitudeLongitude(double latitude, double longitude)
+    {
+        return DbGeography.PointFromText(string .Format("POINT( {0} {1} )", longitude, latitude), 4326);
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;By looking at BingGeoCoder's source code I know that if an error occurs, or if it finds no matches then it will return the string 'No results' which means my DbGeography cannot be found.  If I do get a response back with some level of confidence then I can use the inbuilt .Net method PointFromText from the DbGeography class to return a database persistable geography location.&lt;/p&gt;</content:encoded></item></channel></rss>

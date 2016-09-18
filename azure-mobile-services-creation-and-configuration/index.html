@@ -1,0 +1,261 @@
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    <title>Azure Mobile Services Creation and Configuration - Stephen Kennedy</title>
+
+    <meta name="HandheldFriendly" content="True">
+    <meta name="MobileOptimized" content="320">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+    <meta name="description" content="">
+
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Azure Mobile Services Creation and Configuration">
+    <meta name="twitter:description" content="">
+
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Azure Mobile Services Creation and Configuration">
+    <meta property="og:description" content="">
+
+    <link href="../favicon.ico" rel="shortcut icon" type="image/x-icon">
+    <link href="http://localhost:2368/apple-touch-icon-precomposed.png" rel="apple-touch-icon">
+
+    <link rel="stylesheet" type="text/css" href="../assets/css/uno.css?v=86ac6b006d">
+
+    <link rel="canonical" href="http://www.devenable.com/azure-mobile-services-creation-and-configuration/">
+    <meta name="referrer" content="no-referrer-when-downgrade">
+    <link rel="amphtml" href="http://www.devenable.com/azure-mobile-services-creation-and-configuration/amp/">
+    
+    <meta property="og:site_name" content="Stephen Kennedy">
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Azure Mobile Services Creation and Configuration">
+    <meta property="og:description" content="Introduction This is second item in my blog series around creating a proof of concept with Xamarin and Azure Mobile Services, you can find the first part / introduction here. Microsoft has some pretty good documentation on how to get up and running with the .Net flavor of Azure Mobile Services.">
+    <meta property="og:url" content="http://www.devenable.com/azure-mobile-services-creation-and-configuration/">
+    <meta property="article:published_time" content="2014-04-11T12:23:14.000Z">
+    <meta property="article:modified_time" content="2014-10-07T07:54:16.000Z">
+    <meta property="article:tag" content="Mobile Services">
+    
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Azure Mobile Services Creation and Configuration">
+    <meta name="twitter:description" content="Introduction This is second item in my blog series around creating a proof of concept with Xamarin and Azure Mobile Services, you can find the first part / introduction here. Microsoft has some pretty good documentation on how to get up and running with the .Net flavor of Azure Mobile Services.">
+    <meta name="twitter:url" content="http://www.devenable.com/azure-mobile-services-creation-and-configuration/">
+    <meta name="twitter:label1" content="Written by">
+    <meta name="twitter:data1" content="Stephen Kennedy">
+    <meta name="twitter:label2" content="Filed under">
+    <meta name="twitter:data2" content="Mobile Services">
+    
+    <script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "publisher": {
+        "@type": "Organization",
+        "name": "Stephen Kennedy",
+        "logo": "http://www.devenable.com/ghost/img/ghosticon.jpg"
+    },
+    "author": {
+        "@type": "Person",
+        "name": "Stephen Kennedy",
+        "url": "http://www.devenable.com/author/stephen-kennedy/",
+        "sameAs": []
+    },
+    "headline": "Azure Mobile Services Creation and Configuration",
+    "url": "http://www.devenable.com/azure-mobile-services-creation-and-configuration/",
+    "datePublished": "2014-04-11T12:23:14.000Z",
+    "dateModified": "2014-10-07T07:54:16.000Z",
+    "keywords": "Mobile Services",
+    "description": "Introduction This is second item in my blog series around creating a proof of concept with Xamarin and Azure Mobile Services, you can find the first part / introduction here. Microsoft has some pretty good documentation on how to get up and running with the .Net flavor of Azure Mobile Services.",
+    "mainEntityOfPage": {
+        "@type": "WebPage",
+        "@id": "http://www.devenable.com"
+    }
+}
+    </script>
+
+    <meta name="generator" content="Ghost 0.11">
+    <link rel="alternate" type="application/rss+xml" title="Stephen Kennedy" href="http://www.devenable.com/rss/">
+
+</head>
+<body class="post-template tag-mobile-services no-js">
+
+    <span class="mobile btn-mobile-menu">
+        <i class="icon icon-list btn-mobile-menu__icon"></i>
+        <i class="icon icon-x-circle btn-mobile-close__icon hidden"></i>
+    </span>
+
+    <header class="panel-cover panel-cover--collapsed ">
+  <div class="panel-main">
+
+    <div class="panel-main__inner panel-inverted">
+    <div class="panel-main__content">
+
+        <h1 class="panel-cover__title panel-title"><a href="http://www.devenable.com" title="link to homepage for Stephen Kennedy">Stephen Kennedy</a></h1>
+        <hr class="panel-cover__divider">
+        <p class="panel-cover__description">Software engineer in the Microsoft technology stack, focusing on native and high-scale systems development.  Works for Readify.</p>
+        <hr class="panel-cover__divider panel-cover__divider--secondary">
+
+        <div class="navigation-wrapper">
+
+          <nav class="cover-navigation cover-navigation--primary">
+            <ul class="navigation">
+              <li class="navigation__item"><a href="../index.html#blog" title="link to Stephen Kennedy blog" class="blog-button">Blog</a></li>
+            </ul>
+          </nav>
+
+          
+<nav class="cover-navigation navigation--social">
+  <ul class="navigation">
+
+
+  <!-- Twitter -->
+  <li class="navigation__item">
+    <a href="http://twitter.com/daleanthony" title="@DaleAnthony on Twitter">
+      <i class="icon icon-social-twitter"></i>
+      <span class="label">Twitter</span>
+    </a>
+  </li>
+
+    <!-- Dribbble -->
+    <li class="navigation__item">
+      <a href="http://dribbble.com/daleanthony" title="Dale-Anthony on Dribbble">
+        <i class="icon icon-social-dribbble"></i>
+        <span class="label">Dribbble</span>
+      </a>
+    </li>
+
+    <!-- Email -->
+    <li class="navigation__item">
+      <a href="mailto:hello@daleanthony.com" title="Email hello@daleanthony.com">
+        <i class="icon icon-mail"></i>
+        <span class="label">Email</span>
+      </a>
+    </li>
+
+    <!-- RSS -->
+    <li class="navigation__item">
+      <a href="../rss/index.rss" title="Subscribe">
+        <i class="icon icon-rss"></i>
+        <span class="label">RSS</span>
+      </a>
+    </li>
+
+  </ul>
+</nav>
+
+        </div>
+
+      </div>
+
+    </div>
+
+    <div class="panel-cover--overlay"></div>
+  </div>
+</header>
+    <div class="content-wrapper">
+        <div class="content-wrapper__inner">
+            
+
+  <article class="post-container post-container--single">
+
+    <header class="post-header">
+      <div class="post-meta">
+        <time datetime="11 Apr 2014" class="post-meta__date date">11 Apr 2014</time> • <span class="post-meta__tags tags">on <a href="../tag/mobile-services/">Mobile Services</a></span>
+        <!--<span class="post-meta__author author"><img src="" alt="profile image for Stephen Kennedy" class="avatar post-meta__avatar" /> by Stephen Kennedy</span>-->
+      </div>
+      <h1 class="post-title">Azure Mobile Services Creation and Configuration</h1>
+    </header>
+
+    <section class="post tag-mobile-services">
+      <h2 id="introduction">Introduction</h2>
+
+<p>This is second item in my blog series around creating a proof of concept with <a href="http://xamarin.com/">Xamarin</a> and <a href="http://azure.microsoft.com/en-us/services/mobile-services/">Azure Mobile Services</a>, you can find the first part / introduction <a href="../xamarin-android-with-azure-mobile-services-net-blog-series/">here</a>.</p>
+
+<p>Microsoft has some pretty good documentation on how to get up and running with the .Net flavor of Azure Mobile Services.  I'm not going to regurgitate it so if you need a finger in the right direction you can find what you need right <a href="http://www.windowsazure.com/en-us/documentation/articles/mobile-services-windows-store-get-started/">here</a>.  For the purposes of this proof of concept you do not need to complete the Windows Store application steps, but you are quite welcome to do so.</p>
+
+<blockquote>
+  <p>Note:  The instructions on the Microsoft website state that you need VS2013 to complete their tutorial.  VS2013 is only required if you want to create the Windows Store 8.1 client, otherwise, VS2012 is perfectly sufficient.</p>
+</blockquote>
+
+<h2 id="dependencies">Dependencies</h2>
+
+<p>The .Net flavor of Azure Mobile Services is built upon technology that a lot of developers will already be quite familiar with.  At a very high level it is an OData ASP.Net Web API project.</p>
+
+<p>It comprises of the following built in components:</p>
+
+<ul>
+<li>Autofac</li>
+<li>AutoMapper</li>
+<li>Entity Framework
+<ul><li>SQL Azure (default)</li>
+<li>MongoDB</li></ul></li>
+<li>ASP.Net Web API</li>
+<li>Microsoft Owin (primarily around security)</li>
+<li>Newtonsoft.Json</li>
+<li>And the various Azure platform components</li>
+</ul>
+
+<p>A lot of these 'dependencies' can either be removed or replaced.  For example, no code in the template actually uses Autofac so you could probably replace it with an alternate IoC framework, or remove it completely.  AutoMapper is really only used if you want to inherit from the MappedEntityDomainManager class (which I will describe in a later blog post) so if all you have are simple CRUD operations using directly exposed entity types then you should be fine removing that dependency as well.</p>
+
+<p>Obviously, being a .Net project you can also include your own libraries and dependencies.</p>
+
+<h2 id="projectstructure">Project Structure</h2>
+
+<p><em>WebApiConfig.cs</em> - An unsurprising inclusion given that this is basically an ASP.Net Web API project.  It does provide some additional hooks through the ConfigOptions class to allow you to configure the mobile services.  This is also where you can start the call to initializing your database.</p>
+
+<p><em>Controllers</em> - The initial controller you will find is the TodoItemController.  It inherits from the built in TableController which gives you a very simple CRUD interface to work with where you are more or less directly exposing your entities over the wire.  Looking at the code in this controller along with some of the example client code should give you a relatively straight forward picture on how to proceed.  In a later blog post I will go through the more complex MappedEntityDomainManager base class which allows you to expose different objects (DTOs) from you domain entities.</p>
+
+<p><em>DataObjects</em> - This is where you define the data entities that you will be persisting and their structure.</p>
+
+<p><em>Models</em> - Personally, I find the name of this folder / namespace pretty confusing.  Generally when discussed in patterns models are simple objects, typically exposed to a UI through the use of one of the <strong>M</strong> patterns (<strong>M</strong>VP, <strong>M</strong>VC, <strong>M</strong>VVM).  For Azure Mobile Services this folder / namespace houses the Entity Framework DbContext.</p>
+
+<p><em>ScheduledJobs</em> - This is another area that I will go into further detail in a later blog post.  This is where you define the logic for what occurs when the scheduled job is invoked.  In the ASP.Net management portal you then define when this scheduled job should be invoked.</p>
+
+<h2 id="mobileservicesproofofconceptcomponents">Mobile Services Proof Of Concept Components</h2>
+
+<p>With all of the above in mind the server will be implementing two core components.</p>
+
+<ul>
+<li>A scheduled task will be created to pull data from the external data source and graft it to the underlying data structure described below.  Since the raw data format is a CSV with addresses (no geo-coordinates) it will also need to talk to the Bing Maps API in order to convert these addresses to longitude and latitude co-ordinates.  This component will also need to be configured to run nightly.</li>
+<li>A Web API controller that is used to service requests.  On top of the standard read operations it will also support a single custom operation that will return all of the public Internet locations within a defined distance (radius).</li>
+</ul>
+
+<h2 id="mobileservicesportalconfiguration">Mobile Services Portal Configuration</h2>
+
+<p>I configured my service as follows:</p>
+
+<ul>
+<li>Just to use the free 20MB SQL Azure database, as I only need a small set of data, and I want to use the spatial support that SQL Azure offers.</li>
+<li>Configured to my Git repository to allow for triggered deployments.</li>
+<li>In the cloud App Settings I placed the URL for my external data source.</li>
+<li>In the Scheduler tab I created and enabled a job called PullPublicInternetData to run nightly at 11pm.  In a future blog post I will go over the implementation details of this job.</li>
+</ul>
+
+<p>Everything else is just the stock standard defaults.  </p>
+
+<hr>
+
+<p>In my next blog post I will detail the data structures involved and how they have been set up.</p>
+    </section>
+
+  </article>
+
+
+
+
+            <footer class="footer">
+    <span class="footer__copyright">© 2016. All rights reserved.</span>
+    <span class="footer__copyright"><a href="http://uno.daleanthony.com" title="link to page for Uno Ghost theme">Uno theme</a> by <a href="http://daleanthony.com" title="link to website for Dale-Anthony">Dale-Anthony</a></span>
+    <span class="footer__copyright">Proudly published with <a href="http://ghost.org" title="link to Ghost website">Ghost</a></span>
+</footer>        </div>
+    </div>
+
+    <!-- You can safely delete this line if your theme does not require jQuery -->
+<script type="text/javascript" src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
+
+    <script type="text/javascript" src="../assets/js/main.js?v=86ac6b006d"></script>
+	<script type="text/javascript" src="http://google-code-prettify.googlecode.com/svn/loader/run_prettify.js"></script>
+</body>

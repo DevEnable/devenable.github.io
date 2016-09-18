@@ -1,0 +1,303 @@
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    <title>Microsoft's Redis Implementation - Mind the Gap - Stephen Kennedy</title>
+
+    <meta name="HandheldFriendly" content="True">
+    <meta name="MobileOptimized" content="320">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+    <meta name="description" content="">
+
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Microsoft's Redis Implementation - Mind the Gap">
+    <meta name="twitter:description" content="">
+
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Microsoft's Redis Implementation - Mind the Gap">
+    <meta property="og:description" content="">
+
+    <link href="../favicon.ico" rel="shortcut icon" type="image/x-icon">
+    <link href="http://localhost:2368/apple-touch-icon-precomposed.png" rel="apple-touch-icon">
+
+    <link rel="stylesheet" type="text/css" href="../assets/css/uno.css?v=86ac6b006d">
+
+    <link rel="canonical" href="http://www.devenable.com/microsofts-redis-implementation-mind-the-gap/">
+    <meta name="referrer" content="no-referrer-when-downgrade">
+    <link rel="amphtml" href="http://www.devenable.com/microsofts-redis-implementation-mind-the-gap/amp/">
+    
+    <meta property="og:site_name" content="Stephen Kennedy">
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Microsoft's Redis Implementation - Mind the Gap">
+    <meta property="og:description" content="Lesson's learnt Redis on Windows.   Originally I had this as one big blog post, but I've decided to split it up into the technical issues and conjecture.  See part 2 here. Redis - Microsoft Open Technologies Microsoft Open Technologies, a subsidary of Microsoft, has a port of the popular Redis">
+    <meta property="og:url" content="http://www.devenable.com/microsofts-redis-implementation-mind-the-gap/">
+    <meta property="article:published_time" content="2015-04-15T10:46:00.000Z">
+    <meta property="article:modified_time" content="2015-04-15T10:55:12.000Z">
+    <meta property="article:tag" content="Redis">
+    
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Microsoft's Redis Implementation - Mind the Gap">
+    <meta name="twitter:description" content="Lesson's learnt Redis on Windows.   Originally I had this as one big blog post, but I've decided to split it up into the technical issues and conjecture.  See part 2 here. Redis - Microsoft Open Technologies Microsoft Open Technologies, a subsidary of Microsoft, has a port of the popular Redis">
+    <meta name="twitter:url" content="http://www.devenable.com/microsofts-redis-implementation-mind-the-gap/">
+    <meta name="twitter:label1" content="Written by">
+    <meta name="twitter:data1" content="Stephen Kennedy">
+    <meta name="twitter:label2" content="Filed under">
+    <meta name="twitter:data2" content="Redis">
+    
+    <script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "publisher": {
+        "@type": "Organization",
+        "name": "Stephen Kennedy",
+        "logo": "http://www.devenable.com/ghost/img/ghosticon.jpg"
+    },
+    "author": {
+        "@type": "Person",
+        "name": "Stephen Kennedy",
+        "url": "http://www.devenable.com/author/stephen-kennedy/",
+        "sameAs": []
+    },
+    "headline": "Microsoft&#x27;s Redis Implementation - Mind the Gap",
+    "url": "http://www.devenable.com/microsofts-redis-implementation-mind-the-gap/",
+    "datePublished": "2015-04-15T10:46:00.000Z",
+    "dateModified": "2015-04-15T10:55:12.000Z",
+    "keywords": "Redis",
+    "description": "Lesson&#x27;s learnt Redis on Windows.   Originally I had this as one big blog post, but I&#x27;ve decided to split it up into the technical issues and conjecture.  See part 2 here. Redis - Microsoft Open Technologies Microsoft Open Technologies, a subsidary of Microsoft, has a port of the popular Redis",
+    "mainEntityOfPage": {
+        "@type": "WebPage",
+        "@id": "http://www.devenable.com"
+    }
+}
+    </script>
+
+    <meta name="generator" content="Ghost 0.11">
+    <link rel="alternate" type="application/rss+xml" title="Stephen Kennedy" href="http://www.devenable.com/rss/">
+
+</head>
+<body class="post-template tag-redis no-js">
+
+    <span class="mobile btn-mobile-menu">
+        <i class="icon icon-list btn-mobile-menu__icon"></i>
+        <i class="icon icon-x-circle btn-mobile-close__icon hidden"></i>
+    </span>
+
+    <header class="panel-cover panel-cover--collapsed ">
+  <div class="panel-main">
+
+    <div class="panel-main__inner panel-inverted">
+    <div class="panel-main__content">
+
+        <h1 class="panel-cover__title panel-title"><a href="http://www.devenable.com" title="link to homepage for Stephen Kennedy">Stephen Kennedy</a></h1>
+        <hr class="panel-cover__divider">
+        <p class="panel-cover__description">Software engineer in the Microsoft technology stack, focusing on native and high-scale systems development.  Works for Readify.</p>
+        <hr class="panel-cover__divider panel-cover__divider--secondary">
+
+        <div class="navigation-wrapper">
+
+          <nav class="cover-navigation cover-navigation--primary">
+            <ul class="navigation">
+              <li class="navigation__item"><a href="../index.html#blog" title="link to Stephen Kennedy blog" class="blog-button">Blog</a></li>
+            </ul>
+          </nav>
+
+          
+<nav class="cover-navigation navigation--social">
+  <ul class="navigation">
+
+
+  <!-- Twitter -->
+  <li class="navigation__item">
+    <a href="http://twitter.com/daleanthony" title="@DaleAnthony on Twitter">
+      <i class="icon icon-social-twitter"></i>
+      <span class="label">Twitter</span>
+    </a>
+  </li>
+
+    <!-- Dribbble -->
+    <li class="navigation__item">
+      <a href="http://dribbble.com/daleanthony" title="Dale-Anthony on Dribbble">
+        <i class="icon icon-social-dribbble"></i>
+        <span class="label">Dribbble</span>
+      </a>
+    </li>
+
+    <!-- Email -->
+    <li class="navigation__item">
+      <a href="mailto:hello@daleanthony.com" title="Email hello@daleanthony.com">
+        <i class="icon icon-mail"></i>
+        <span class="label">Email</span>
+      </a>
+    </li>
+
+    <!-- RSS -->
+    <li class="navigation__item">
+      <a href="../rss/index.rss" title="Subscribe">
+        <i class="icon icon-rss"></i>
+        <span class="label">RSS</span>
+      </a>
+    </li>
+
+  </ul>
+</nav>
+
+        </div>
+
+      </div>
+
+    </div>
+
+    <div class="panel-cover--overlay"></div>
+  </div>
+</header>
+    <div class="content-wrapper">
+        <div class="content-wrapper__inner">
+            
+
+  <article class="post-container post-container--single">
+
+    <header class="post-header">
+      <div class="post-meta">
+        <time datetime="15 Apr 2015" class="post-meta__date date">15 Apr 2015</time> • <span class="post-meta__tags tags">on <a href="../tag/redis/">Redis</a></span>
+        <!--<span class="post-meta__author author"><img src="" alt="profile image for Stephen Kennedy" class="avatar post-meta__avatar" /> by Stephen Kennedy</span>-->
+      </div>
+      <h1 class="post-title">Microsoft's Redis Implementation - Mind the Gap</h1>
+    </header>
+
+    <section class="post tag-redis">
+      <p class="intro">Lesson's learnt Redis on Windows.</p>
+
+<blockquote>
+  <p>Originally I had this as one big blog post, but I've decided to split it up into the technical issues and conjecture.  See part 2 <a href="http://www.devenable.com/company-backed-open-source/">here</a>.</p>
+</blockquote>
+
+<h2 id="redismicrosoftopentechnologies">Redis - Microsoft Open Technologies</h2>
+
+<p>Microsoft Open Technologies, a subsidary of Microsoft, has a <a href="https://msopentech.com/opentech-projects/redis/">port</a> of the popular <a href="http://redis.io">Redis</a> database.  A client I am currently consulting for was looking at changing from an in-memory session state provider to an out-of-process session state provider and Redis was chosen as the initial provider.</p>
+
+<h2 id="bewarethefeaturegap">Beware the feature gap</h2>
+
+<p>The latest official version of Redis is 3.0.0.  The latest stable version of Redis that runs on Windows (provided by Microsoft Open Technologies) is version 2.8.19.</p>
+
+<p>Much of what you read online will be on the latest version of Redis available, so make sure you consider the version of Redis that the documentation relates to when making decisions.  </p>
+
+<p>So what is the gap between the two versions?  <strong>Redis Cluster</strong>.</p>
+
+<p>Now, before you go whacking the panic button it isn't as bad as it sounds.  The earlier versions of Redis (including the Windows variant) do offer clustering, it is just that the failover handling is done in a different way.</p>
+
+<h2 id="failoveroptions">Failover options</h2>
+
+<p>Aside from data sharding, the other big feature of Redis Cluster is how it handles failover.  Here are the options that are available to you. </p>
+
+<h3 id="rediscluster">Redis Cluster</h3>
+
+<p>Redis Cluster (Redis 3.0) is essentially self managing.  The nodes of the cluster will look after themselves and propogate masters in the event of failover.  If a client attempts to talk to a master that has since recycled into a readonly slave it will received a MOVED failure message.</p>
+
+<blockquote>
+  <p><strong>Note:</strong> This is my interpretation of the <a href="http://redis.io/topics/cluster-tutorial">Redis Cluster</a> documentation.  Take what I've said with a pinch of salt :).</p>
+</blockquote>
+
+<h3 id="redissentinel">Redis Sentinel</h3>
+
+<p>Redis Sentinel is available to you with the Windows port of Redis.  You run it using the redis-server executable, but with a --sentinel command switch.  </p>
+
+<p>I'm not going to go into too much detail as to how it works as the <a href="http://redis.io/topics/sentinel">official documentation</a> explains this well.</p>
+
+<p>But there are two key differences with Redis Cluster.</p>
+
+<ol>
+<li>It is not a self-managed cluster, you need to run a seperate set of processes in order to monitor cluster health.  </li>
+<li>In order for a client to know that a new master has been promoted it needs to subscribe to switch-master messages published by Sentinel.  The client then needs to use this new master.</li>
+</ol>
+
+<h3 id="infrastructure">Infrastructure</h3>
+
+<p>You could potentially use products such as VMWare Fault Tolerance and thus take the responsibility away from the client code.  Microsoft Azure uses Redis 2.8./* and this is probably the approach they took in regards to handling fault tolerance.</p>
+
+<blockquote>
+  <p><strong>Important Note:</strong>  For that reason this only an issue for self-hosted Redis deployments.</p>
+</blockquote>
+
+<h3 id="bigredbutton">Big red button</h3>
+
+<p>This is the approach that StackExchange take through their <a href="https://github.com/opserver/Opserver">Opserver</a> tool.  According to <a href="http://meta.stackexchange.com/questions/230366/how-does-stack-exchange-work-around-the-lack-of-redis-clustering">this post</a> on Stack Exchange (which is a year old) they hit the 'big red button' when they notice a failover.  </p>
+
+<h2 id="netclientside">.Net clientside</h2>
+
+<p>There are two main libraries available to .Net developers when interacting with Redis.  The <a href="https://github.com/StackExchange/StackExchange.Redis.git">StackExchange.Redis</a> client and the <a href="https://github.com/ServiceStack/ServiceStack.Redis">ServiceStack</a> client.</p>
+
+<p>ServiceStack is a commercial product but it looks to have Sentinel support.</p>
+
+<p>If your organization doesn't want to shell out for ServiceStack then you're probably going to need to look at the StackExchange.Redis client.  This is the client API that Microsoft have chosen for their <a href="https://www.nuget.org/packages/Microsoft.Web.RedisSessionStateProvider/">session state provider</a>.  The library has a dependency on the strongly named StackExchange.Redis provider.  </p>
+
+<p>The diagram below illustrates the between dependencies if you want to use Microsoft's session state provider.</p>
+
+<p><img src="../content/images/2015/04/Redis-Session-State-2.png" alt=""></p>
+
+<h2 id="thefailovergap">The failover gap</h2>
+
+<p>There is an <a href="https://github.com/StackExchange/StackExchange.Redis/issues/22">issue</a> at present where the StackExchange library doesn't listen to the Sentinel pub/sub channel for master promotion in the event of a failover.  In the event of a failover the Redis client will continue to try and talk to a node that may now be a slave after being demoted.</p>
+
+<p>This flows onto the Microsoft session state provider as on initialization it only reads from the web.config for the cache node connection strings.</p>
+
+<h2 id="pluggingthegap">Plugging the gap</h2>
+
+<p>Don't want to use a fault tolerance products or hit a 'big red button'?  These options are still available to you.</p>
+
+<p>If you are using Microsoft's session state provider then you are going to need to either write your own or inherit and override some of its behaviour.  Principally you are going to want it to connect to Sentinel in order to get the current master (as the web application may have just recycled) and you are also going to want to get from Sentinel what the current master is in the event of a failover.</p>
+
+<p>This configuration from Sentinel should probably be stored in a seperate singleton configuration to be re-used by subsequent Redis connections.</p>
+
+<p>In terms of actually figuring out when a new master has been promoted here are some avenues available to you.</p>
+
+<h4 id="listeningtosentinelspubsubchannel">Listening to Sentinel's pub/sub channel</h4>
+
+<p>This is as per the <a href="https://github.com/StackExchange/StackExchange.Redis/issues/22">issue</a> I linked to earlier which will inform you on the subscription whenever Sentinel has promoted a new master. <br>
+I have personally not used this fix.  Also be aware that it will create a subscription per connection which is probably not ideal, particularly if you are using Microsoft's session state provider as it will create a StackExchange.Redis connection per provider instance.</p>
+
+<p>If you only want to create one subscription per AppDomain then you'll need to run a background thread that runs indefinitely.  There are plenty of articles from Microsoft that state that this is not good practice.</p>
+
+<h4 id="exceptionhandling">Exception Handling</h4>
+
+<p>You could handle and parse Redis exceptions picking out those that relate to a down (or demoted) master.  </p>
+
+<p>There could be some restrictions in your topology here as you will want to know when you are communicating with a slave so you're probably going to want to ensure that all of your slaves are read-only (which is the default).</p>
+
+<p>You may also want to consider limiting the number of requests for the current master from Sentinel when a potential failover has occurred.</p>
+
+<p>This approach is likely to resolve in a longer period of time before the client (web application) recovers from a failover but doesn't involve having a backend process that watches the Sentinel pub/sub channel.</p>
+
+<h2 id="sowhereisthepullrequest">So where is the pull request?</h2>
+
+<p>Here I am writing to 'complain' about valuable contributions made by many individuals to the development community often investing significant amounts of their own time.  Shouldn't I just fix it?  Isn't that, after all, the spirit of open source?</p>
+
+<p>Chances are most of the work to resolve this can be done in the StackExchange client.  Once we've figured out how to solve this issue for our client I may create a more generic solution as a PR.  The only issue I have this stage (aside from available personal time) is that a more generic solution that doesn't involve having a subscription per Redis client instance is likely to involve a fairly significant PR.</p>
+
+<p>But, for those intrepid adventurers that are starting (or have already started on) their Microsoft Redis journey be warned there is a gap to consider.</p>
+
+<p>But isn't this all Microsoft's fault?  I go into the perceived issues in a seperate blog post as a kind-of <a href="http://www.devenable.com/company-backed-open-source/">part 2</a>.</p>
+    </section>
+
+  </article>
+
+
+
+
+            <footer class="footer">
+    <span class="footer__copyright">© 2016. All rights reserved.</span>
+    <span class="footer__copyright"><a href="http://uno.daleanthony.com" title="link to page for Uno Ghost theme">Uno theme</a> by <a href="http://daleanthony.com" title="link to website for Dale-Anthony">Dale-Anthony</a></span>
+    <span class="footer__copyright">Proudly published with <a href="http://ghost.org" title="link to Ghost website">Ghost</a></span>
+</footer>        </div>
+    </div>
+
+    <!-- You can safely delete this line if your theme does not require jQuery -->
+<script type="text/javascript" src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
+
+    <script type="text/javascript" src="../assets/js/main.js?v=86ac6b006d"></script>
+	<script type="text/javascript" src="http://google-code-prettify.googlecode.com/svn/loader/run_prettify.js"></script>
+</body>

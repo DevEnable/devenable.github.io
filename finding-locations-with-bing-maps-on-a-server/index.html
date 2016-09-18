@@ -1,0 +1,242 @@
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    <title>Finding Locations With Bing Maps on a Server - Stephen Kennedy</title>
+
+    <meta name="HandheldFriendly" content="True">
+    <meta name="MobileOptimized" content="320">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+    <meta name="description" content="">
+
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Finding Locations With Bing Maps on a Server">
+    <meta name="twitter:description" content="">
+
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Finding Locations With Bing Maps on a Server">
+    <meta property="og:description" content="">
+
+    <link href="../favicon.ico" rel="shortcut icon" type="image/x-icon">
+    <link href="http://localhost:2368/apple-touch-icon-precomposed.png" rel="apple-touch-icon">
+
+    <link rel="stylesheet" type="text/css" href="../assets/css/uno.css?v=86ac6b006d">
+
+    <link rel="canonical" href="http://www.devenable.com/finding-locations-with-bing-maps-on-a-server/">
+    <meta name="referrer" content="no-referrer-when-downgrade">
+    <link rel="amphtml" href="http://www.devenable.com/finding-locations-with-bing-maps-on-a-server/amp/">
+    
+    <meta property="og:site_name" content="Stephen Kennedy">
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Finding Locations With Bing Maps on a Server">
+    <meta property="og:description" content="This blog post is supplementary to the Azure Mobile Services Scheduled Jobs blog post.  In this blog post I will briefly go over getting a server to query the Bing Maps REST API in order to find geo-location data for a supplied address. It's Not Just About Code But, before">
+    <meta property="og:url" content="http://www.devenable.com/finding-locations-with-bing-maps-on-a-server/">
+    <meta property="article:published_time" content="2014-04-27T04:04:51.000Z">
+    <meta property="article:modified_time" content="2014-04-27T04:04:51.000Z">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Finding Locations With Bing Maps on a Server">
+    <meta name="twitter:description" content="This blog post is supplementary to the Azure Mobile Services Scheduled Jobs blog post.  In this blog post I will briefly go over getting a server to query the Bing Maps REST API in order to find geo-location data for a supplied address. It's Not Just About Code But, before">
+    <meta name="twitter:url" content="http://www.devenable.com/finding-locations-with-bing-maps-on-a-server/">
+    <meta name="twitter:label1" content="Written by">
+    <meta name="twitter:data1" content="Stephen Kennedy">
+    
+    <script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "publisher": {
+        "@type": "Organization",
+        "name": "Stephen Kennedy",
+        "logo": "http://www.devenable.com/ghost/img/ghosticon.jpg"
+    },
+    "author": {
+        "@type": "Person",
+        "name": "Stephen Kennedy",
+        "url": "http://www.devenable.com/author/stephen-kennedy/",
+        "sameAs": []
+    },
+    "headline": "Finding Locations With Bing Maps on a Server",
+    "url": "http://www.devenable.com/finding-locations-with-bing-maps-on-a-server/",
+    "datePublished": "2014-04-27T04:04:51.000Z",
+    "dateModified": "2014-04-27T04:04:51.000Z",
+    "description": "This blog post is supplementary to the Azure Mobile Services Scheduled Jobs blog post.  In this blog post I will briefly go over getting a server to query the Bing Maps REST API in order to find geo-location data for a supplied address. It&#x27;s Not Just About Code But, before",
+    "mainEntityOfPage": {
+        "@type": "WebPage",
+        "@id": "http://www.devenable.com"
+    }
+}
+    </script>
+
+    <meta name="generator" content="Ghost 0.11">
+    <link rel="alternate" type="application/rss+xml" title="Stephen Kennedy" href="http://www.devenable.com/rss/">
+
+</head>
+<body class="post-template no-js">
+
+    <span class="mobile btn-mobile-menu">
+        <i class="icon icon-list btn-mobile-menu__icon"></i>
+        <i class="icon icon-x-circle btn-mobile-close__icon hidden"></i>
+    </span>
+
+    <header class="panel-cover panel-cover--collapsed ">
+  <div class="panel-main">
+
+    <div class="panel-main__inner panel-inverted">
+    <div class="panel-main__content">
+
+        <h1 class="panel-cover__title panel-title"><a href="http://www.devenable.com" title="link to homepage for Stephen Kennedy">Stephen Kennedy</a></h1>
+        <hr class="panel-cover__divider">
+        <p class="panel-cover__description">Software engineer in the Microsoft technology stack, focusing on native and high-scale systems development.  Works for Readify.</p>
+        <hr class="panel-cover__divider panel-cover__divider--secondary">
+
+        <div class="navigation-wrapper">
+
+          <nav class="cover-navigation cover-navigation--primary">
+            <ul class="navigation">
+              <li class="navigation__item"><a href="../index.html#blog" title="link to Stephen Kennedy blog" class="blog-button">Blog</a></li>
+            </ul>
+          </nav>
+
+          
+<nav class="cover-navigation navigation--social">
+  <ul class="navigation">
+
+
+  <!-- Twitter -->
+  <li class="navigation__item">
+    <a href="http://twitter.com/daleanthony" title="@DaleAnthony on Twitter">
+      <i class="icon icon-social-twitter"></i>
+      <span class="label">Twitter</span>
+    </a>
+  </li>
+
+    <!-- Dribbble -->
+    <li class="navigation__item">
+      <a href="http://dribbble.com/daleanthony" title="Dale-Anthony on Dribbble">
+        <i class="icon icon-social-dribbble"></i>
+        <span class="label">Dribbble</span>
+      </a>
+    </li>
+
+    <!-- Email -->
+    <li class="navigation__item">
+      <a href="mailto:hello@daleanthony.com" title="Email hello@daleanthony.com">
+        <i class="icon icon-mail"></i>
+        <span class="label">Email</span>
+      </a>
+    </li>
+
+    <!-- RSS -->
+    <li class="navigation__item">
+      <a href="../rss/index.rss" title="Subscribe">
+        <i class="icon icon-rss"></i>
+        <span class="label">RSS</span>
+      </a>
+    </li>
+
+  </ul>
+</nav>
+
+        </div>
+
+      </div>
+
+    </div>
+
+    <div class="panel-cover--overlay"></div>
+  </div>
+</header>
+    <div class="content-wrapper">
+        <div class="content-wrapper__inner">
+            
+
+  <article class="post-container post-container--single">
+
+    <header class="post-header">
+      <div class="post-meta">
+        <time datetime="27 Apr 2014" class="post-meta__date date">27 Apr 2014</time> • <span class="post-meta__tags tags"></span>
+        <!--<span class="post-meta__author author"><img src="" alt="profile image for Stephen Kennedy" class="avatar post-meta__avatar" /> by Stephen Kennedy</span>-->
+      </div>
+      <h1 class="post-title">Finding Locations With Bing Maps on a Server</h1>
+    </header>
+
+    <section class="post">
+      <p class="intro">This blog post is supplementary to the <a href="../azure-mobile-services-scheduled-jobs/">Azure Mobile Services Scheduled Jobs</a> blog post.  In this blog post I will briefly go over getting a server to query the Bing Maps REST API in order to find geo-location data for a supplied address.</p>
+
+<h2 id="itsnotjustaboutcode">It's Not Just About Code</h2>
+
+<p>But, before you can being calling the Bing API you need to set up an API key so that Bing can identify who is calling it.  In many situations this is a free service, however, there are some cases where Microsoft will charge you to utilize the Bing API.  Microsoft have a great little <a href="http://www.microsoft.com/maps/Licensing/licensing.aspx">questionnaire</a> that will help you to figure out if there is any cost involved in the use of their API.  For my proof of concept since I would be providing this application as a free public consumer mobile application it has no costs associated with it. </p>
+
+<p>There may also be quota restrictions around the usage of the API depending on your level of licensing.  Consult the Bing Maps <a href="http://www.microsoft.com/maps/Licensing/licensing.aspx">licensing page</a> for more information.</p>
+
+<hr>
+
+<h2 id="obtainingabingmapsapikey">Obtaining a Bing Maps API Key</h2>
+
+<p>First up, visit the <a href="http://www.bingmapsportal.com/">Bing Maps Portal</a> and sign in with your Microsoft account.   Fill in all of the necessary information required to create an account and then go to the Create or view keys link.  Fill in a few basic details about your application and then you should have a key.  Take this key and then use it when creating requests on the Bing Maps API. </p>
+
+<p>When creating an instance of the BingGeoCoder you supply this API key as its constructor argument.  The BingGeoCoder will include this key as part of all geo-location requests.  This key correlates to the key querystring parameter in the REST API.</p>
+
+<hr>
+
+<h2 id="binggeocodinghelper">Bing Geocoding Helper</h2>
+
+<p>BingGeoCodingHelper is a small <a href="http://www.nuget.org/packages/BingGeocodingHelper">Nuget</a> package that I found which acts as a .Net wrapper for Bing's REST API.  It is fairly basic, and you will probably want to roll your own for production purposes, but for my proof of concept it was adequate.  You can at least use it as a starting point, at least in terms of how to start calling Bing's API.  It is open source and <a href="http://www.nuget.org/packages/BingGeocodingHelper">present on Github</a>.</p>
+
+<blockquote>
+  <p><strong>Note:</strong>  If you look at BingGeoCoder's source code you will see that its Geocode method that takes a set of address parameters is hard coded to US.  You may need to create your own query.  The Rest API location documentation can be found <a href="http://msdn.microsoft.com/en-us/library/ff701714.aspx">here</a> 
+  .</p>
+</blockquote>
+
+<hr>
+
+<h2 id="querying">Querying</h2>
+
+<p>Here is the call I make through BingGeoCoder in my proof of concept.  As I want to persist this information in my database I am converting the result to the <a href="http://msdn.microsoft.com/en-us/library/system.data.spatial.dbgeography.aspx">DbGeography</a> class, however, you can do whatever you want with the result sent back by Bing Maps.</p>
+
+<pre><code class="language-prettyprint lang-cs">public DbGeography GetGeography(string address, string suburb, int postCode)  
+{
+     BingGeocoderResult result = _client.Geocode(String .Format(" {0}, {1} , {2}, Australia", address, suburb, postCode));
+
+     if (result.Confidence == "No results")
+     {
+         return null;
+     }
+
+     return GeographyHelper.FromLatitudeLongitude(double .Parse(result.Latitude), double.Parse(result.Longitude));
+}
+
+public static class GeographyHelper  
+{
+    public static DbGeography FromLatitudeLongitude(double latitude, double longitude)
+    {
+        return DbGeography.PointFromText(string .Format("POINT( {0} {1} )", longitude, latitude), 4326);
+    }
+}
+</code></pre>
+
+<p>By looking at BingGeoCoder's source code I know that if an error occurs, or if it finds no matches then it will return the string 'No results' which means my DbGeography cannot be found.  If I do get a response back with some level of confidence then I can use the inbuilt .Net method PointFromText from the DbGeography class to return a database persistable geography location.</p>
+    </section>
+
+  </article>
+
+
+
+
+            <footer class="footer">
+    <span class="footer__copyright">© 2016. All rights reserved.</span>
+    <span class="footer__copyright"><a href="http://uno.daleanthony.com" title="link to page for Uno Ghost theme">Uno theme</a> by <a href="http://daleanthony.com" title="link to website for Dale-Anthony">Dale-Anthony</a></span>
+    <span class="footer__copyright">Proudly published with <a href="http://ghost.org" title="link to Ghost website">Ghost</a></span>
+</footer>        </div>
+    </div>
+
+    <!-- You can safely delete this line if your theme does not require jQuery -->
+<script type="text/javascript" src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
+
+    <script type="text/javascript" src="../assets/js/main.js?v=86ac6b006d"></script>
+	<script type="text/javascript" src="http://google-code-prettify.googlecode.com/svn/loader/run_prettify.js"></script>
+</body>

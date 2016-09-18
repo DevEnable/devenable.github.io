@@ -1,0 +1,353 @@
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    <title>Azure Mobile Services Scheduled Jobs - Stephen Kennedy</title>
+
+    <meta name="HandheldFriendly" content="True">
+    <meta name="MobileOptimized" content="320">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+    <meta name="description" content="">
+
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Azure Mobile Services Scheduled Jobs">
+    <meta name="twitter:description" content="">
+
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Azure Mobile Services Scheduled Jobs">
+    <meta property="og:description" content="">
+
+    <link href="../favicon.ico" rel="shortcut icon" type="image/x-icon">
+    <link href="http://localhost:2368/apple-touch-icon-precomposed.png" rel="apple-touch-icon">
+
+    <link rel="stylesheet" type="text/css" href="../assets/css/uno.css?v=86ac6b006d">
+
+    <link rel="canonical" href="http://www.devenable.com/azure-mobile-services-scheduled-jobs/">
+    <meta name="referrer" content="no-referrer-when-downgrade">
+    <link rel="amphtml" href="http://www.devenable.com/azure-mobile-services-scheduled-jobs/amp/">
+    
+    <meta property="og:site_name" content="Stephen Kennedy">
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Azure Mobile Services Scheduled Jobs">
+    <meta property="og:description" content="In this blog post I am continuing with my cross mobile application series that I started here by creating a scheduled job in c# and configuring it in the Azure Portal.   PullPublicInternetDataJob This class orchestrates the execution of the job and is what Azure Mobile Services calls.  The naming of">
+    <meta property="og:url" content="http://www.devenable.com/azure-mobile-services-scheduled-jobs/">
+    <meta property="article:published_time" content="2014-04-17T10:30:43.000Z">
+    <meta property="article:modified_time" content="2014-10-07T07:53:46.000Z">
+    <meta property="article:tag" content="Mobile Services">
+    
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Azure Mobile Services Scheduled Jobs">
+    <meta name="twitter:description" content="In this blog post I am continuing with my cross mobile application series that I started here by creating a scheduled job in c# and configuring it in the Azure Portal.   PullPublicInternetDataJob This class orchestrates the execution of the job and is what Azure Mobile Services calls.  The naming of">
+    <meta name="twitter:url" content="http://www.devenable.com/azure-mobile-services-scheduled-jobs/">
+    <meta name="twitter:label1" content="Written by">
+    <meta name="twitter:data1" content="Stephen Kennedy">
+    <meta name="twitter:label2" content="Filed under">
+    <meta name="twitter:data2" content="Mobile Services">
+    
+    <script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "publisher": {
+        "@type": "Organization",
+        "name": "Stephen Kennedy",
+        "logo": "http://www.devenable.com/ghost/img/ghosticon.jpg"
+    },
+    "author": {
+        "@type": "Person",
+        "name": "Stephen Kennedy",
+        "url": "http://www.devenable.com/author/stephen-kennedy/",
+        "sameAs": []
+    },
+    "headline": "Azure Mobile Services Scheduled Jobs",
+    "url": "http://www.devenable.com/azure-mobile-services-scheduled-jobs/",
+    "datePublished": "2014-04-17T10:30:43.000Z",
+    "dateModified": "2014-10-07T07:53:46.000Z",
+    "keywords": "Mobile Services",
+    "description": "In this blog post I am continuing with my cross mobile application series that I started here by creating a scheduled job in c# and configuring it in the Azure Portal.   PullPublicInternetDataJob This class orchestrates the execution of the job and is what Azure Mobile Services calls.  The naming of",
+    "mainEntityOfPage": {
+        "@type": "WebPage",
+        "@id": "http://www.devenable.com"
+    }
+}
+    </script>
+
+    <meta name="generator" content="Ghost 0.11">
+    <link rel="alternate" type="application/rss+xml" title="Stephen Kennedy" href="http://www.devenable.com/rss/">
+
+</head>
+<body class="post-template tag-mobile-services no-js">
+
+    <span class="mobile btn-mobile-menu">
+        <i class="icon icon-list btn-mobile-menu__icon"></i>
+        <i class="icon icon-x-circle btn-mobile-close__icon hidden"></i>
+    </span>
+
+    <header class="panel-cover panel-cover--collapsed ">
+  <div class="panel-main">
+
+    <div class="panel-main__inner panel-inverted">
+    <div class="panel-main__content">
+
+        <h1 class="panel-cover__title panel-title"><a href="http://www.devenable.com" title="link to homepage for Stephen Kennedy">Stephen Kennedy</a></h1>
+        <hr class="panel-cover__divider">
+        <p class="panel-cover__description">Software engineer in the Microsoft technology stack, focusing on native and high-scale systems development.  Works for Readify.</p>
+        <hr class="panel-cover__divider panel-cover__divider--secondary">
+
+        <div class="navigation-wrapper">
+
+          <nav class="cover-navigation cover-navigation--primary">
+            <ul class="navigation">
+              <li class="navigation__item"><a href="../index.html#blog" title="link to Stephen Kennedy blog" class="blog-button">Blog</a></li>
+            </ul>
+          </nav>
+
+          
+<nav class="cover-navigation navigation--social">
+  <ul class="navigation">
+
+
+  <!-- Twitter -->
+  <li class="navigation__item">
+    <a href="http://twitter.com/daleanthony" title="@DaleAnthony on Twitter">
+      <i class="icon icon-social-twitter"></i>
+      <span class="label">Twitter</span>
+    </a>
+  </li>
+
+    <!-- Dribbble -->
+    <li class="navigation__item">
+      <a href="http://dribbble.com/daleanthony" title="Dale-Anthony on Dribbble">
+        <i class="icon icon-social-dribbble"></i>
+        <span class="label">Dribbble</span>
+      </a>
+    </li>
+
+    <!-- Email -->
+    <li class="navigation__item">
+      <a href="mailto:hello@daleanthony.com" title="Email hello@daleanthony.com">
+        <i class="icon icon-mail"></i>
+        <span class="label">Email</span>
+      </a>
+    </li>
+
+    <!-- RSS -->
+    <li class="navigation__item">
+      <a href="../rss/index.rss" title="Subscribe">
+        <i class="icon icon-rss"></i>
+        <span class="label">RSS</span>
+      </a>
+    </li>
+
+  </ul>
+</nav>
+
+        </div>
+
+      </div>
+
+    </div>
+
+    <div class="panel-cover--overlay"></div>
+  </div>
+</header>
+    <div class="content-wrapper">
+        <div class="content-wrapper__inner">
+            
+
+  <article class="post-container post-container--single">
+
+    <header class="post-header">
+      <div class="post-meta">
+        <time datetime="17 Apr 2014" class="post-meta__date date">17 Apr 2014</time> • <span class="post-meta__tags tags">on <a href="../tag/mobile-services/">Mobile Services</a></span>
+        <!--<span class="post-meta__author author"><img src="" alt="profile image for Stephen Kennedy" class="avatar post-meta__avatar" /> by Stephen Kennedy</span>-->
+      </div>
+      <h1 class="post-title">Azure Mobile Services Scheduled Jobs</h1>
+    </header>
+
+    <section class="post tag-mobile-services">
+      <p class="intro">In this blog post I am continuing with my cross mobile application series that I started <a href="../xamarin-android-with-azure-mobile-services-net-blog-series/">here</a> by creating a scheduled job in c# and configuring it in the Azure Portal.</p>  
+
+<hr>
+
+<h1 id="pullpublicinternetdatajob">PullPublicInternetDataJob</h1>
+
+<p>This class orchestrates the execution of the job and is what Azure Mobile Services calls.  The naming of this class is important as this is tied to the configuration in Azure.</p>
+
+<h2 id="initializationdisposal">Initialization / Disposal</h2>
+
+<p>It makes sense that scheduled jobs do not necessarily interact with the database, so unlike the controllers scheduled jobs do not have a dependency on the DataContext.  However, in our case we do in fact want to update the database.  Simple enough really.  </p>
+
+<pre><code class="language-prettyprint lang-cs">private DataVicContext _context;
+
+protected override void Initialize( ScheduledJobDescriptor scheduledJobDescriptor, CancellationToken cancellationToken)  
+{
+    base.Initialize(scheduledJobDescriptor, cancellationToken);
+
+    _context = new DataVicContext(Services.Settings.Name.Replace('-' , '_'));
+}
+</code></pre>
+
+<p>And the tidy-up code.</p>
+
+<pre><code class="language-prettyprint lang-cs">protected override void Dispose(bool disposing)  
+{
+    if (disposing)
+    {
+        GC.SuppressFinalize( this);
+    }
+
+    _context.Dispose();
+    base.Dispose(disposing);
+}
+</code></pre>
+
+<p>The rest of the work happens inside the ExecuteAsync method.</p>
+
+<hr>
+
+<h2 id="pullingdownthedata">Pulling Down the Data</h2>
+
+<p>Initially I pull down the data using the following method.  </p>
+
+<pre><code class="language-prettyprint lang-cs">private static Task&lt; byte[]&gt; GetPublicInternetData()  
+{
+    Uri dataLocation = new Uri(CloudConfigurationManager .GetSetting("PublicInternetLocationsUrl"),
+                        UriKind.Absolute);
+
+    using ( WebClient client = new WebClient())
+    {
+        return client.DownloadDataTaskAsync(dataLocation);
+    }
+}
+</code></pre>
+
+<p>As you can see from the code, I am using a configuration value I have defined in the Azure Mobile Services configuration tab for the URL in which to download from.  After receiving the data I perform a check to ensure that I got something back.</p>
+
+<p>Once it has that CSV file it needs to parse, and then graft into the correct format so that it can be inserted into the database.  Since the CSV file does not contain any geo-coordinates we will need to ask the Bing Maps API for those co-ordinates before inserting anything in the database.</p>
+
+<hr>
+
+<h2 id="clearingtheexistingdata">Clearing the Existing Data</h2>
+
+<p>Since this is just a proof of concept I went for the quick and the dirty.  You could probably write something more sophisticated in terms of checking if the data has changed before removing a record if you wanted to.  Since Entity Framework isn't really meant for bulk operations I'm again cheating and using some ad-hoc SQL to clear my database.  </p>
+
+<pre><code class="language-prettyprint lang-cs">var clearTask = _context.Database.ExecuteSqlCommandAsync("TRUNCATE TABLE [DataVic].[InternetLocations]");  
+</code></pre>
+
+<p>I got Entity Framework to do this asynchronously so that I can parse the received data and look-up geo-locations while this is going on.  The await on this call happens just before the Entity Framework call to submit changes.  In reality this task should complete well before the await blocker anyway.</p>
+
+<hr>
+
+<h2 id="parsingandapplyinglogictothedata">Parsing and Applying Logic to the Data</h2>
+
+<p>I am not going to go into too much detail in this section.  The actual logic is probably of little interest to you if you are primarily interested in just learning about Azure Mobile Services.</p>
+
+<p>The pseudo-code for essentially what happens is:</p>
+
+<ul>
+<li>Parse the data into a list of an intermediary type containing raw information.  Into the CsvInternetLocation class described below.
+<ul><li>The file is parsed using the <a href="https://github.com/JoshClose/CsvHelper">CsvHelper</a> library.  This library is easy to use and has some <a href="http://joshclose.github.io/CsvHelper/">pretty decent documentation</a> to boot.</li></ul></li>
+<li>For each record use the Bing Maps REST API to look up addresses, keeping track of both successful geo-location lookups and failures.</li>
+</ul>
+
+<pre><code class="language-prettyprint lang-cs">public class CsvInternetLocation  
+{
+    public string Title { get; set; }
+
+    public string Address2 { get; set; }
+
+    public string OtherFacilities { get; set; }
+
+    public int PostCode { get; set; }
+
+    public string Suburb { get; set; }
+}
+</code></pre>
+
+<p>The mapping I have is a literal mapping of column headings to property names which requires nothing to be set up in CsvHelper.</p>
+
+<blockquote>
+  <p>Given that most people probably aren't all that interested in what happens in regards to the Bing Maps lookup I'm going to write a separate blog post to describe this process.  </p>
+</blockquote>
+
+<hr>
+
+<h2 id="loggingfailures">Logging Failures</h2>
+
+<p>CreateInternetLocations either returns an InternetLocation entity or null, the geo-location lookup occurs within this method and it can fail as you need to make a remote call with data that cannot be trusted to be correct.  If it returns null then a failure will have been added to the collection.  The LocationLookupFailure class simply houses the raw CSV record with its line number.  This is a pretty basic implementation and a real world application would probably contain something more sophisticated using a retry pattern or the <a href="http://msdn.microsoft.com/en-us/library/hh680934(v=pandp.50).aspx">The Transient Fault Handling Application Block</a>.</p>
+
+<pre><code class="language-prettyprint lang-cs">List&lt; LocationLookupFailure&gt; failures = new List&lt;LocationLookupFailure &gt;();
+
+var records = locations  
+    .Select((location, i) =&gt; CreateInternetLocation(location, i + 1, failures))
+    .Where(r =&gt; r != null).ToList();
+
+if (failures.Count &gt; 0)  
+{
+    LogFailures(failures, locations.Count);
+}
+
+private class LocationLookupFailure  
+{
+    public int Index { get; set; }
+    public CsvInternetLocation Location { get ; set ; }
+}
+</code></pre>
+
+<p>The call to actually log this data is very simple:  </p>
+
+<pre><code class="language-prettyprint lang-cs">this.Services.Log.Warn(myString);  
+</code></pre>
+
+<p>The Log object exposes the ITraceWriter contract, and mobile services extends with the TraceWriterExtensions class.  These extension methods include the usual trace level suspects warn, error, info, and debug.</p>
+
+<hr>
+
+<h2 id="savingtothedatabase">Saving to the Database</h2>
+
+<p>There really is nothing special here.  All I do is add the created InternetLocation entities to the context and call SubmitChanges.  I also have a try/catch around the SubmitChanges call and log any errors.</p>
+
+<h2 id="configuringthejobinazure">Configuring the Job in Azure</h2>
+
+<p>You will have noted that the name of the class for the scheduled job that I created was PullPublicInternetDataJob.  Inside the Azure Portal on your mobile service page you will see a Scheduler tab.  With the free version of Azure Mobile Services you are able to create a single scheduled job.  Once you have clicked Create you should see the following dialog: <br>
+<img src="../content/images/2014/Apr/NewScheduledJob.png" alt="">
+Give your job the name of the scheduled job class that you created in Visual Studio <em>without</em> the 'Job' postfix.  While this dialog will allow you to configure how often you want the job to run it does not include any options in terms of what time to run the job.  You can configure this by clicking on the job once it is created.</p>
+
+<p>Initially this job will be disabled and you can either run it once to see that it is working, or enable it immediately.  Below I have my scheduled job enabled. <br>
+<img src="../content/images/2014/Apr/ScheduledJobExample.png" alt=""></p>
+
+<hr>
+
+<h2 id="viewingthelogs">Viewing the Logs</h2>
+
+<p>Just jump to the logs tab in order to view the log entries created by the scheduled job (and any other Mobile Services component).  Click on the details button at the bottom of the page to see the full log message entry. <br>
+<img src="../content/images/2014/Apr/ServiceLog.png" alt=""></p>
+
+<hr>
+
+<p>And there you have it.  Once you publish your service code to Azure you should have a fully functional scheduled job ready to run.</p>
+    </section>
+
+  </article>
+
+
+
+
+            <footer class="footer">
+    <span class="footer__copyright">© 2016. All rights reserved.</span>
+    <span class="footer__copyright"><a href="http://uno.daleanthony.com" title="link to page for Uno Ghost theme">Uno theme</a> by <a href="http://daleanthony.com" title="link to website for Dale-Anthony">Dale-Anthony</a></span>
+    <span class="footer__copyright">Proudly published with <a href="http://ghost.org" title="link to Ghost website">Ghost</a></span>
+</footer>        </div>
+    </div>
+
+    <!-- You can safely delete this line if your theme does not require jQuery -->
+<script type="text/javascript" src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
+
+    <script type="text/javascript" src="../assets/js/main.js?v=86ac6b006d"></script>
+	<script type="text/javascript" src="http://google-code-prettify.googlecode.com/svn/loader/run_prettify.js"></script>
+</body>

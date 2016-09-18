@@ -1,0 +1,338 @@
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    <title>Creating an Apple Maps custom overlay image with Xamarin - Stephen Kennedy</title>
+
+    <meta name="HandheldFriendly" content="True">
+    <meta name="MobileOptimized" content="320">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+    <meta name="description" content="">
+
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Creating an Apple Maps custom overlay image with Xamarin">
+    <meta name="twitter:description" content="">
+
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Creating an Apple Maps custom overlay image with Xamarin">
+    <meta property="og:description" content="">
+
+    <link href="../favicon.ico" rel="shortcut icon" type="image/x-icon">
+    <link href="http://localhost:2368/apple-touch-icon-precomposed.png" rel="apple-touch-icon">
+
+    <link rel="stylesheet" type="text/css" href="../assets/css/uno.css?v=86ac6b006d">
+
+    <link rel="canonical" href="http://www.devenable.com/creating-an-apple-maps-custom-overlay-image-with-xamarin/">
+    <meta name="referrer" content="no-referrer-when-downgrade">
+    <link rel="amphtml" href="http://www.devenable.com/creating-an-apple-maps-custom-overlay-image-with-xamarin/amp/">
+    
+    <meta property="og:site_name" content="Stephen Kennedy">
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Creating an Apple Maps custom overlay image with Xamarin">
+    <meta property="og:description" content="Want to add an Apple Maps image overlay with Xamarin?  Heres how! When working on my proof of concept one especially large pain point was figuring out how to add a correctly scaled image overlay to my maps in order to display the represented WiFi signal range.  In this blog">
+    <meta property="og:url" content="http://www.devenable.com/creating-an-apple-maps-custom-overlay-image-with-xamarin/">
+    <meta property="article:published_time" content="2014-05-25T05:30:36.000Z">
+    <meta property="article:modified_time" content="2014-10-07T07:52:33.000Z">
+    <meta property="article:tag" content="Xamarin">
+    
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Creating an Apple Maps custom overlay image with Xamarin">
+    <meta name="twitter:description" content="Want to add an Apple Maps image overlay with Xamarin?  Heres how! When working on my proof of concept one especially large pain point was figuring out how to add a correctly scaled image overlay to my maps in order to display the represented WiFi signal range.  In this blog">
+    <meta name="twitter:url" content="http://www.devenable.com/creating-an-apple-maps-custom-overlay-image-with-xamarin/">
+    <meta name="twitter:label1" content="Written by">
+    <meta name="twitter:data1" content="Stephen Kennedy">
+    <meta name="twitter:label2" content="Filed under">
+    <meta name="twitter:data2" content="Xamarin">
+    
+    <script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "publisher": {
+        "@type": "Organization",
+        "name": "Stephen Kennedy",
+        "logo": "http://www.devenable.com/ghost/img/ghosticon.jpg"
+    },
+    "author": {
+        "@type": "Person",
+        "name": "Stephen Kennedy",
+        "url": "http://www.devenable.com/author/stephen-kennedy/",
+        "sameAs": []
+    },
+    "headline": "Creating an Apple Maps custom overlay image with Xamarin",
+    "url": "http://www.devenable.com/creating-an-apple-maps-custom-overlay-image-with-xamarin/",
+    "datePublished": "2014-05-25T05:30:36.000Z",
+    "dateModified": "2014-10-07T07:52:33.000Z",
+    "keywords": "Xamarin",
+    "description": "Want to add an Apple Maps image overlay with Xamarin?  Heres how! When working on my proof of concept one especially large pain point was figuring out how to add a correctly scaled image overlay to my maps in order to display the represented WiFi signal range.  In this blog",
+    "mainEntityOfPage": {
+        "@type": "WebPage",
+        "@id": "http://www.devenable.com"
+    }
+}
+    </script>
+
+    <meta name="generator" content="Ghost 0.11">
+    <link rel="alternate" type="application/rss+xml" title="Stephen Kennedy" href="http://www.devenable.com/rss/">
+
+</head>
+<body class="post-template tag-xamarin no-js">
+
+    <span class="mobile btn-mobile-menu">
+        <i class="icon icon-list btn-mobile-menu__icon"></i>
+        <i class="icon icon-x-circle btn-mobile-close__icon hidden"></i>
+    </span>
+
+    <header class="panel-cover panel-cover--collapsed ">
+  <div class="panel-main">
+
+    <div class="panel-main__inner panel-inverted">
+    <div class="panel-main__content">
+
+        <h1 class="panel-cover__title panel-title"><a href="http://www.devenable.com" title="link to homepage for Stephen Kennedy">Stephen Kennedy</a></h1>
+        <hr class="panel-cover__divider">
+        <p class="panel-cover__description">Software engineer in the Microsoft technology stack, focusing on native and high-scale systems development.  Works for Readify.</p>
+        <hr class="panel-cover__divider panel-cover__divider--secondary">
+
+        <div class="navigation-wrapper">
+
+          <nav class="cover-navigation cover-navigation--primary">
+            <ul class="navigation">
+              <li class="navigation__item"><a href="../index.html#blog" title="link to Stephen Kennedy blog" class="blog-button">Blog</a></li>
+            </ul>
+          </nav>
+
+          
+<nav class="cover-navigation navigation--social">
+  <ul class="navigation">
+
+
+  <!-- Twitter -->
+  <li class="navigation__item">
+    <a href="http://twitter.com/daleanthony" title="@DaleAnthony on Twitter">
+      <i class="icon icon-social-twitter"></i>
+      <span class="label">Twitter</span>
+    </a>
+  </li>
+
+    <!-- Dribbble -->
+    <li class="navigation__item">
+      <a href="http://dribbble.com/daleanthony" title="Dale-Anthony on Dribbble">
+        <i class="icon icon-social-dribbble"></i>
+        <span class="label">Dribbble</span>
+      </a>
+    </li>
+
+    <!-- Email -->
+    <li class="navigation__item">
+      <a href="mailto:hello@daleanthony.com" title="Email hello@daleanthony.com">
+        <i class="icon icon-mail"></i>
+        <span class="label">Email</span>
+      </a>
+    </li>
+
+    <!-- RSS -->
+    <li class="navigation__item">
+      <a href="../rss/index.rss" title="Subscribe">
+        <i class="icon icon-rss"></i>
+        <span class="label">RSS</span>
+      </a>
+    </li>
+
+  </ul>
+</nav>
+
+        </div>
+
+      </div>
+
+    </div>
+
+    <div class="panel-cover--overlay"></div>
+  </div>
+</header>
+    <div class="content-wrapper">
+        <div class="content-wrapper__inner">
+            
+
+  <article class="post-container post-container--single">
+
+    <header class="post-header">
+      <div class="post-meta">
+        <time datetime="25 May 2014" class="post-meta__date date">25 May 2014</time> • <span class="post-meta__tags tags">on <a href="../tag/xamarin/">Xamarin</a></span>
+        <!--<span class="post-meta__author author"><img src="" alt="profile image for Stephen Kennedy" class="avatar post-meta__avatar" /> by Stephen Kennedy</span>-->
+      </div>
+      <h1 class="post-title">Creating an Apple Maps custom overlay image with Xamarin</h1>
+    </header>
+
+    <section class="post tag-xamarin">
+      <p class="intro">Want to add an Apple Maps image overlay with Xamarin?  Heres how!</p>
+
+<p>When working on my <a href="../xamarin-android-with-azure-mobile-services-net-blog-series/">proof of concept</a> one especially large pain point was figuring out how to add a correctly scaled image overlay to my maps in order to display the represented WiFi signal range.  In this blog post I will take you through how this is done.</p>
+
+<h2 id="addingtheoverlay">Adding the overlay</h2>
+
+<p>Since I am denoting a range, the obvious overlay to use is MKCircle, and the code for this is pretty simple.</p>
+
+<pre><code class="language-prettyprint lang-cs">MKCircle wifiRange = MKCircle.Circle (annotation.Coordinate, 200);  
+this.InternetLocationsMap.AddOverlay(wifiRange);
+</code></pre>
+
+<p><strong>Note:</strong> InternetLocationsMaps is my MKMapView.</p>
+
+<p>I’m just using arbitrary range of 200 metres here.  (Which is generous for a consumer grade WiFi device I know)</p>
+
+<hr>
+
+<h2 id="mapdelegate">MapDelegate</h2>
+
+<p>If you look at the Xamarin documentation it will talk about <a href="http://docs.xamarin.com/guides/ios/platform_features/ios_maps_walkthrough/">creating a custom annotation</a>, and the path we are going to take here is very similar.  </p>
+
+<p>The pertinent code here is:</p>
+
+<pre><code class="language-prettyprint lang-cs">private class MapDelegate : MKMapViewDelegate  
+</code></pre>
+
+<pre><code class="language-prettyprint lang-cs">            public override MKOverlayRenderer OverlayRenderer(MKMapView mapView, IMKOverlay overlay)
+            {
+                return new WiFiRangeOverlayRenderer (overlay, WifiRange);
+            }
+
+            public override MKOverlayView GetViewForOverlay(MKMapView mapView, NSObject overlay)
+            {
+                return new WifiRangeOverlayView (overlay, WifiRange);
+            }
+</code></pre>
+
+<p>The OverlayRenderer is for iOS 7, the GetViewForOverlay override is for older versions of iOS.  If running an iOS 7 device and an OverlayRender method is implemented the GetViewForOverlay logic will not fire.  </p>
+
+<p>Just make sure that your map uses the delegate (I do this inside the controllers ViewDidLoad) method:</p>
+
+<pre><code class="language-prettyprint lang-cs">this.InternetLocationsMap.Delegate = new MapDelegate ();  
+</code></pre>
+
+<hr>
+
+<h2 id="overlayviewrenderer">Overlay view / renderer</h2>
+
+<p>I am going to show these two classes together, because in the case of this example their code is basically identical.</p>
+
+<pre><code class="language-prettyprint lang-cs">internal class WiFiRangeOverlayRenderer : MKOverlayRenderer  
+    {
+        private readonly WiFiRangeImageHelper _helper;
+
+        public WiFiRangeOverlayRenderer(IMKOverlay overlay, UIImage image) : base(overlay)
+        {
+            _helper = new WiFiRangeImageHelper (overlay, image);
+        }
+
+        public override void DrawMapRect (MKMapRect mapRect, float zoomScale, MonoTouch.CoreGraphics.CGContext context)
+        {
+            _helper.DrawMapRect (mapRect, context, this.RectForMapRect);
+        }
+    }
+</code></pre>
+
+<pre><code class="language-prettyprint lang-cs">internal class WifiRangeOverlayView : MKOverlayView  
+    {
+        private readonly WiFiRangeImageHelper _helper;
+
+        public WifiRangeOverlayView (NSObject overlay, UIImage image) : base(overlay)
+        {
+            _helper = new WiFiRangeImageHelper (overlay, image);
+        }
+
+        public override void DrawMapRect (MKMapRect mapRect, float zoomScale, MonoTouch.CoreGraphics.CGContext context)
+        {
+            _helper.DrawMapRect (mapRect, context, this.RectForMapRect);
+        }
+    }
+</code></pre>
+
+<p>All they effectively do is daisy chain the logic into the WiFiRangeImageHelper class which is explained below.</p>
+
+<hr>
+
+<h2 id="drawingtheimage">Drawing the image</h2>
+
+<p>The helper class I am calling is where all of the work happens.  </p>
+
+<pre><code class="language-prettyprint lang-cs">internal class WiFiRangeImageHelper  
+    {
+        private readonly UIImage _wifiRangeImage;
+        private readonly MKMapRect _mapBounds;
+
+        public WiFiRangeImageHelper(object overlay, UIImage image)
+        {
+            _wifiRangeImage = image;
+            _mapBounds = ((MKCircle)overlay).BoundingMapRect;
+        }
+
+        public void DrawMapRect (MKMapRect mapRect, MonoTouch.CoreGraphics.CGContext context, Func&lt;MKMapRect, RectangleF&gt; calculateDisplayRectangle)
+        {
+            RectangleF bounds = calculateDisplayRectangle(_mapBounds);
+            context.ScaleCTM (1, -1);
+            context.TranslateCTM (0, -bounds.Height);
+            context.DrawImage (bounds, _wifiRangeImage.CGImage);
+        }
+    }
+</code></pre>
+
+<p>There are a few things to note here.</p>
+
+<p>My whole naming / implementation approach was pretty lazy, it is just a proof of concept though, and I'm sure you can do better.</p>
+
+<p>I wasn’t able to figure out why the constructors overlay size was different from the one passed into DrawMapRect, but it looked far more correct.</p>
+
+<p>The Func<mkmaprect rectangle> gives an opportunity for the MKOverlayView and MKOverlayRenderer to pass in their logic for converting map based dimensions to a drawable bound on the screen.</mkmaprect></p>
+
+<p>If you want an explanation of the logic within DrawMapRect I suggest you take a look at the <a href="http://docs.xamarin.com/guides/ios/application_fundamentals/graphics_animation_ios/">Xamarin documentation</a> but basic cliff notes are.</p>
+
+<ul>
+<li>Correct the image so that its origin is in the top left corner instead of the bottom right (which is the default).  For my image this doesn’t make a difference as it is a circle radial, but I have included the logic for completeness.</li>
+<li>Draw the image onto the users screen.</li>
+</ul>
+
+<blockquote>
+  <p>Note:  If looking at Objective C examples please note that Xamarin does not use a number of Apple types for drawing.  From their <a href="http://docs.xamarin.com/guides/ios/under_the_hood/api_design/">documentation</a> - they have replaced CGRect, CGPoint, and CGSize with System.Drawing types.  </p>
+</blockquote>
+
+<hr>
+
+<h2 id="resources">Resources</h2>
+
+<p>I used a combination of online resources to figure this out.  The key resource for this was an <a href="http://www.raywenderlich.com/30001/overlay-images-and-overlay-views-with-mapkit-tutorial">excellent blog post</a> written by Ray Wenderlich which explains in Objective C how this is done.  </p>
+
+<p>I also used these resources for my translation to Xamarin / C#:</p>
+
+<ul>
+<li>Xamarin iOS <a href="http://docs.xamarin.com/recipes/ios/content_controls/map_view/add_an_overlay_to_a_map/">overlay documentation</a></li>
+<li>Xamarin <a href="http://iosapi.xamarin.com/index.aspx?link=M%3AMonoTouch.MapKit.MKOverlayView.RectForMapRect(MonoTouch.MapKit.MKMapRect)">RectForMapRect documentation</a></li>
+<li>Apples <a href="https://developer.apple.com/library/ios/documentation/MapKit/Reference/MapKitDataTypesReference/Reference/reference.html">MapKit datatypes</a></li>
+</ul>
+
+<p>One thing this exercise has taught me though.  I really need to learn how to read Objective C code.</p>
+    </section>
+
+  </article>
+
+
+
+
+            <footer class="footer">
+    <span class="footer__copyright">© 2016. All rights reserved.</span>
+    <span class="footer__copyright"><a href="http://uno.daleanthony.com" title="link to page for Uno Ghost theme">Uno theme</a> by <a href="http://daleanthony.com" title="link to website for Dale-Anthony">Dale-Anthony</a></span>
+    <span class="footer__copyright">Proudly published with <a href="http://ghost.org" title="link to Ghost website">Ghost</a></span>
+</footer>        </div>
+    </div>
+
+    <!-- You can safely delete this line if your theme does not require jQuery -->
+<script type="text/javascript" src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
+
+    <script type="text/javascript" src="../assets/js/main.js?v=86ac6b006d"></script>
+	<script type="text/javascript" src="http://google-code-prettify.googlecode.com/svn/loader/run_prettify.js"></script>
+</body>
